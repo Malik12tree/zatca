@@ -32,6 +32,7 @@ class Invoice
 		)) =
 			Template::render('simplified-tax-invoice', [
 				"EGS_INFO" => $data["egs_info"],
+				"CUSTOMER_INFO" => $data["customer_info"] ?? [],
 				"LINE_ITEMS" => $data["line_items"] ?? [],
 				"INVOICE_SERIAL_NUMBER" => $data["invoice_serial_number"],
 				"ISSUE_DATE" => $data["issue_date"],

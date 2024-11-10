@@ -111,50 +111,50 @@ list($legalMonetaryTotalRender, $total) = Template::render('@simplified-tax-invo
     </cac:Party>
   </cac:AccountingSupplierParty>
   <cac:AccountingCustomerParty>
-    <?php if (isset($EGS_INFO["customer_info"])): ?>
+    <?php if (isset($CUSTOMER_INFO)): ?>
       <cac:Party>
         <cac:PartyIdentification>
-          <cbc:ID schemeID="CRN"><?= isset($EGS_INFO["customer_info"]["crn_number"]) ? $EGS_INFO["customer_info"]["crn_number"] : '' ?></cbc:ID>
+          <cbc:ID schemeID="CRN"><?= isset($CUSTOMER_INFO["crn_number"]) ? $CUSTOMER_INFO["crn_number"] : '' ?></cbc:ID>
         </cac:PartyIdentification>
         <cac:PostalAddress>
-          <?php if (isset($EGS_INFO["customer_info"]["street"])): ?>
-            <cbc:StreetName><?= $EGS_INFO["customer_info"]["street"] ?></cbc:StreetName>
+          <?php if (isset($CUSTOMER_INFO["street"])): ?>
+            <cbc:StreetName><?= $CUSTOMER_INFO["street"] ?></cbc:StreetName>
           <?php endif ?>
-          <?php if (isset($EGS_INFO["customer_info"]["additional_street"])): ?>
-            <cbc:AdditionalStreetName><?= $EGS_INFO["customer_info"]["additional_street"] ?></cbc:AdditionalStreetName>
+          <?php if (isset($CUSTOMER_INFO["additional_street"])): ?>
+            <cbc:AdditionalStreetName><?= $CUSTOMER_INFO["additional_street"] ?></cbc:AdditionalStreetName>
           <?php endif ?>
-          <?php if (isset($EGS_INFO["customer_info"]["building"])): ?>
-            <cbc:BuildingNumber><?= $EGS_INFO["customer_info"]["building"] ?></cbc:BuildingNumber>
+          <?php if (isset($CUSTOMER_INFO["building"])): ?>
+            <cbc:BuildingNumber><?= $CUSTOMER_INFO["building"] ?></cbc:BuildingNumber>
           <?php endif ?>
-          <?php if (isset($EGS_INFO["customer_info"]["plot_identification"])): ?>
-            <cbc:PlotIdentification><?= $EGS_INFO["customer_info"]["plot_identification"] ?></cbc:PlotIdentification>
+          <?php if (isset($CUSTOMER_INFO["plot_identification"])): ?>
+            <cbc:PlotIdentification><?= $CUSTOMER_INFO["plot_identification"] ?></cbc:PlotIdentification>
           <?php endif ?>
-          <?php if (isset($EGS_INFO["customer_info"]["city_subdivision"])): ?>
-            <cbc:CitySubdivisionName><?= $EGS_INFO["customer_info"]["city_subdivision"] ?></cbc:CitySubdivisionName>
+          <?php if (isset($CUSTOMER_INFO["city_subdivision"])): ?>
+            <cbc:CitySubdivisionName><?= $CUSTOMER_INFO["city_subdivision"] ?></cbc:CitySubdivisionName>
           <?php endif ?>
-          <?php if (isset($EGS_INFO["customer_info"]["city"])): ?>
-            <cbc:CityName><?= $EGS_INFO["customer_info"]["city"] ?></cbc:CityName>
+          <?php if (isset($CUSTOMER_INFO["city"])): ?>
+            <cbc:CityName><?= $CUSTOMER_INFO["city"] ?></cbc:CityName>
           <?php endif ?>
-          <?php if (isset($EGS_INFO["customer_info"]["postal_zone"])): ?>
-            <cbc:PostalZone><?= $EGS_INFO["customer_info"]["postal_zone"] ?></cbc:PostalZone>
+          <?php if (isset($CUSTOMER_INFO["postal_zone"])): ?>
+            <cbc:PostalZone><?= $CUSTOMER_INFO["postal_zone"] ?></cbc:PostalZone>
           <?php endif ?>
-          <?php if (isset($EGS_INFO["customer_info"]["country_sub_entity"])): ?>
-            <cbc:CountrySubentity><?= $EGS_INFO["customer_info"]["country_sub_entity"] ?></cbc:CountrySubentity>
+          <?php if (isset($CUSTOMER_INFO["country_sub_entity"])): ?>
+            <cbc:CountrySubentity><?= $CUSTOMER_INFO["country_sub_entity"] ?></cbc:CountrySubentity>
           <?php endif ?>
           <cac:Country>
             <cbc:IdentificationCode>SA</cbc:IdentificationCode>
           </cac:Country>
         </cac:PostalAddress>
-        <?php if (isset($EGS_INFO["customer_info"]["vat_number"])): ?>
+        <?php if (isset($CUSTOMER_INFO["vat_number"])): ?>
           <cac:PartyTaxScheme>
-            <cbc:CompanyID><?= $EGS_INFO["customer_info"]["vat_number"] ?></cbc:CompanyID>
+            <cbc:CompanyID><?= $CUSTOMER_INFO["vat_number"] ?></cbc:CompanyID>
             <cac:TaxScheme>
               <cbc:ID>VAT</cbc:ID>
             </cac:TaxScheme>
           </cac:PartyTaxScheme>
         <?php endif ?>
         <cac:PartyLegalEntity>
-          <cbc:RegistrationName><?= $EGS_INFO["customer_info"]["buyer_name"] ?></cbc:RegistrationName>
+          <cbc:RegistrationName><?= $CUSTOMER_INFO["buyer_name"] ?></cbc:RegistrationName>
         </cac:PartyLegalEntity>
       </cac:Party>
     <?php endif ?>
