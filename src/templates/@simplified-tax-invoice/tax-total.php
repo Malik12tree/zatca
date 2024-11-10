@@ -7,7 +7,7 @@ $subTotals = [];
 
 $taxesTotal = 0;
 foreach ($LINE_ITEMS as $lineItem) {
-	$totalLineItemDiscount = array_reduce($lineItem['discounts'] ?? [], function ($p, $c) {
+	$totalLineItemDiscount = array_reduce($lineItem['discounts'] ?? [], static function ($p, $c) {
 		return $p + $c['amount'];
 	}, 0);
 	$taxableAmount = ($lineItem['tax_exclusive_price'] * $lineItem['quantity']) - ($totalLineItemDiscount ?? 0);

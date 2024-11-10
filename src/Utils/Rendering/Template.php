@@ -20,7 +20,7 @@ class Template
 	public static function render(string $templateName, array $variables, bool $return = false)
 	{
 		/* No variable leakage! Pure magic~ */
-		return self::capture(function () {
+		return self::capture(static function () {
 			extract(func_get_arg(1));
 
 			return require __DIR__ . '/../../templates/' . func_get_arg(0) . '.php';
