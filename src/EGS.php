@@ -99,4 +99,68 @@ class EGS
 
 		return $invoice->sign($certificate, $this->unit['private_key']);
 	}
+
+
+	public function register($solutionName, $otp)
+	{
+		// Incase of a failure, we need to rollback the state of the EGS unit.
+		$unitCopy = clone $this->unit;
+
+		try {
+			$this->generateNewKeysAndCSR($solutionName);
+			$complianceRequestId = $this->issueComplianceCertificate($otp);
+
+			// * Checking invoice compliance 6 times each of the following types is
+			// * required to be able to issue a production certificate.
+			// * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+			// * ┃  standard-invoice  ━━  standard-credit-note  ━━  standard-debit-note  ┃
+			// * ┃ simplified-invoice ━━ simplified-credit-note ━━ simplified-debit-note ┃
+			// * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+			foreach (InvoiceCode::cases() as $invoiceCode) {
+				foreach (InvoiceType::cases() as $invoiceType) {
+					$data = [
+						"egs_info" => $this->unit,
+
+						"invoice_code" => $invoiceCode,
+						"invoice_type" => $invoiceType,
+
+						"invoice_counter_number" => 1,
+						"invoice_serial_number" => Crypto::uuid4(),
+						"issue_date" => date('Y-m-d'),
+						"issue_time" => date('H:i:s'),
+						"previous_invoice_hash" => '',
+
+						"line_items" => [
+							[
+								"id" => "dummy",
+								"name" => "Dummy Item",
+								"quantity" => 1,
+								"tax_exclusive_price" => 10,
+								"vat_percent" => 0.15,
+							]
+						],
+					];
+					if ($invoiceType != InvoiceType::INVOICE) {
+						$data["cancellation"] = [
+							"canceled_serial_invoice_number" => $data["invoice_serial_number"],
+							"payment_method" => InvoicePaymentMethod::CASH,
+							"reason" => "KSA-10",
+						];
+					}
+
+					$invoice = new Invoice($data);
+					list(
+						"signedInvoice" => $signedInvoice,
+						"hash" => $invoiceHash,
+					) = $this->signInvoice($invoice);
+					$this->checkInvoiceCompliance($signedInvoice, $invoiceHash);
+				}
+			}
+
+			return $this->issueProductionCertificate($complianceRequestId);
+		} catch (Exception $e) {
+			$this->unit = $unitCopy;
+			throw $e;
+		}
+	}
 }
