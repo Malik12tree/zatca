@@ -11,6 +11,10 @@ class Crypto
 		$b[8] = chr(ord($b[8]) & 0x3f | 0x80);
 		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($b), 4));
 	}
+	public static function isUUID($uuid)
+	{
+		return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $uuid);
+	}
 	public static function hashSHA256($data)
 	{
 		return hash('sha256', $data);

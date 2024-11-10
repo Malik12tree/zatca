@@ -6,12 +6,15 @@ use Exception;
 use Malik12tree\ZATCA\Utils\API;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
+use Malik12tree\ZATCA\EGSDatabase;
 
 class EGS
 {
 	private $api;
 	private $unit;
 	private $isProduction;
+	/** @var EGSDatabase|null */
+	private $database;
 	public function __construct($unit, $env = "sandbox")
 	{
 		$this->unit = $unit;
@@ -101,10 +104,25 @@ class EGS
 	}
 
 
+	public function setDatabase($database)
+	{
+		$this->database = $database;
+
+		return $this;
+	}
+
+	public function save()
+	{
+		if (!$this->database) throw new Exception("EGS database is not set.");
+
+		$this->database->save($this);
+
+		return $this;
+	}
 	public function register($solutionName, $otp)
 	{
 		// Incase of a failure, we need to rollback the state of the EGS unit.
-		$unitCopy = clone $this->unit;
+		$unitCopy = $this->unit;
 
 		try {
 			$this->generateNewKeysAndCSR($solutionName);
@@ -157,10 +175,20 @@ class EGS
 				}
 			}
 
-			return $this->issueProductionCertificate($complianceRequestId);
+			$this->issueProductionCertificate($complianceRequestId);
+			return $this;
 		} catch (Exception $e) {
 			$this->unit = $unitCopy;
 			throw $e;
 		}
+	}
+
+	public function getUUID()
+	{
+		return $this->unit['uuid'];
+	}
+	public function toJSON()
+	{
+		return $this->unit;
 	}
 }
