@@ -1,0 +1,27 @@
+{
+    "name": "malik12tree/zatca",
+    "description": "PHP implementation of ZATCA E-Invoicing standards",
+    "version": "0.1.0",
+    "type": "library",
+    "keywords": [
+        "zatca",
+        "invoicing",
+        "egs",
+        "qrcode"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Malik12tree"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Malik12tree\\ZATCA\\": "src/"
+        },
+        "files": [
+            "src/Utils/functions.php"
+        ]
+    },
+    "require": {}
+}
