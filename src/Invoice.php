@@ -160,7 +160,95 @@ class Invoice
 		return $name;
 	}
 
-	public function pdf($qr, $xml)
+	public function hash()
+	{
+		if ($this->cachedHash) return $this->cachedHash;
+
+		$cleanInvoice = $this->cleanedXML();
+
+		$hash = Crypto::hashSHA256($cleanInvoice);
+		$this->cachedHash = base64_encode($hash);
+
+		return $this->cachedHash;
+	}
+
+	public function sign($certificate, $privateKey, $options = [])
+	{
+		$invoiceHash = $this->hash();
+		$certificateInfo = Crypto::getCertificateInfo($certificate);
+
+		$digitalSignature = base64_encode(Crypto::signSHA256($invoiceHash, $privateKey));
+
+		$qr = $this->qr($digitalSignature, $certificateInfo["publicKey"], $certificateInfo['signature']);
+
+		$ublPropertiesVariables = [
+			"SIGN_TIMESTAMP" => date('Y-m-d\TH:i:s\Z'),
+			"CERTIFICATE_HASH" => $certificateInfo["hash"],
+			"CERTIFICATE_ISSUER" => $certificateInfo["issuer"],
+			"CERTIFICATE_SERIAL_NUMBER" => $certificateInfo["serialNumber"],
+		];
+
+		$ublSignaturePropertiesRender =
+			Template::render('@simplified-tax-invoice/ubl-signature/properties', $ublPropertiesVariables);
+		$ublSignaturePropertiesRenderForSigning =
+			Template::render('@simplified-tax-invoice/ubl-signature/properties/for-signing', $ublPropertiesVariables);
+
+		$signedUBLSignaturePropertiesRender = base64_encode(Crypto::hashSHA256($ublSignaturePropertiesRenderForSigning));
+
+		$ublSignatureRender = Template::render('@simplified-tax-invoice/ubl-signature', [
+			"INVOICE_HASH" => $invoiceHash,
+			"SIGNED_PROPERTIES_HASH" => $signedUBLSignaturePropertiesRender,
+			"DIGITAL_SIGNATURE" => $digitalSignature,
+			"CERTIFICATE" => Crypto::cleanCertificate($certificate),
+			"SIGNED_PROPERTIES_XML" => $ublSignaturePropertiesRender,
+		]);
+
+		$invoiceRender = $this->invoiceXML;
+		$invoiceRender = str_replace(
+			['%UBL_EXTENSIONS_STRING%', '%QR_CODE_DATA%'],
+			[$ublSignatureRender, $qr],
+			$invoiceRender
+		);
+
+		$result = [
+			"signedInvoice" => $invoiceRender,
+			"hash" => $invoiceHash,
+			"qr" => $qr,
+		];
+
+		if (isset($options['pdf']) && $options['pdf']) {
+			$result['pdf'] = $this->pdf($result['qr'], $result['signedInvoice']);
+		}
+
+		return $result;
+	}
+
+
+	private function qr($digitalSignature, $publicKey, $signature)
+	{
+		$sellerName = $this->vatName;
+		$vatNumber = $this->vatNumber;
+		$total = $this->total;
+		$vatTotal = $this->totalTax;
+		$dateTime = date('Y-m-d\TH:i:s', strtotime("{$this->issueDate} {$this->issueTime}"));
+
+		$qrTLV = TLV::encodeAll([
+			0x01 => $sellerName,
+			0x02 => $vatNumber,
+			0x03 => $dateTime,
+			0x04 => $total,
+			0x05 => $vatTotal,
+			0x06 => $this->hash(),
+			0x07 => $digitalSignature,
+			0x08 => $publicKey,
+			0x09 => $signature,
+		]);
+
+		return base64_encode($qrTLV);
+	}
+
+
+	private function pdf($qr, $xml)
 	{
 		$qrCode = new QrCode($qr);
 		$qrOutput = new Output\Png();
@@ -201,86 +289,6 @@ class Invoice
 		return $data;
 	}
 
-	public function hash()
-	{
-		if ($this->cachedHash) return $this->cachedHash;
-
-		$cleanInvoice = $this->cleanedXML();
-
-		$hash = Crypto::hashSHA256($cleanInvoice);
-		$this->cachedHash = base64_encode($hash);
-
-		return $this->cachedHash;
-	}
-
-	public function sign($certificate, $privateKey)
-	{
-		$invoiceHash = $this->hash();
-		$certificateInfo = Crypto::getCertificateInfo($certificate);
-
-		$digitalSignature = base64_encode(Crypto::signSHA256($invoiceHash, $privateKey));
-
-		$qr = $this->qr($digitalSignature, $certificateInfo["publicKey"], $certificateInfo['signature']);
-
-		$ublPropertiesVariables = [
-			"SIGN_TIMESTAMP" => date('Y-m-d\TH:i:s\Z'),
-			"CERTIFICATE_HASH" => $certificateInfo["hash"],
-			"CERTIFICATE_ISSUER" => $certificateInfo["issuer"],
-			"CERTIFICATE_SERIAL_NUMBER" => $certificateInfo["serialNumber"],
-		];
-
-		$ublSignaturePropertiesRender =
-			Template::render('@simplified-tax-invoice/ubl-signature/properties', $ublPropertiesVariables);
-		$ublSignaturePropertiesRenderForSigning =
-			Template::render('@simplified-tax-invoice/ubl-signature/properties/for-signing', $ublPropertiesVariables);
-
-		$signedUBLSignaturePropertiesRender = base64_encode(Crypto::hashSHA256($ublSignaturePropertiesRenderForSigning));
-
-		$ublSignatureRender = Template::render('@simplified-tax-invoice/ubl-signature', [
-			"INVOICE_HASH" => $invoiceHash,
-			"SIGNED_PROPERTIES_HASH" => $signedUBLSignaturePropertiesRender,
-			"DIGITAL_SIGNATURE" => $digitalSignature,
-			"CERTIFICATE" => Crypto::cleanCertificate($certificate),
-			"SIGNED_PROPERTIES_XML" => $ublSignaturePropertiesRender,
-		]);
-
-		$invoiceRender = $this->invoiceXML;
-		$invoiceRender = str_replace(
-			['%UBL_EXTENSIONS_STRING%', '%QR_CODE_DATA%'],
-			[$ublSignatureRender, $qr],
-			$invoiceRender
-		);
-
-		return [
-			"signedInvoice" => $invoiceRender,
-			"hash" => $invoiceHash,
-			"qr" => $qr,
-		];
-	}
-
-
-	private function qr($digitalSignature, $publicKey, $signature)
-	{
-		$sellerName = $this->vatName;
-		$vatNumber = $this->vatNumber;
-		$total = $this->total;
-		$vatTotal = $this->totalTax;
-		$dateTime = date('Y-m-d\TH:i:s', strtotime("{$this->issueDate} {$this->issueTime}"));
-
-		$qrTLV = TLV::encodeAll([
-			0x01 => $sellerName,
-			0x02 => $vatNumber,
-			0x03 => $dateTime,
-			0x04 => $total,
-			0x05 => $vatTotal,
-			0x06 => $this->hash(),
-			0x07 => $digitalSignature,
-			0x08 => $publicKey,
-			0x09 => $signature,
-		]);
-
-		return base64_encode($qrTLV);
-	}
 
 	private function cleanedXML()
 	{

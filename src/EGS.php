@@ -109,13 +109,7 @@ class EGS
 
 		if (!$certificate || !$this->unit['private_key']) throw new Exception("EGS is missing a certificate/private key to sign the invoice.");
 
-		$data = $invoice->sign($certificate, $this->unit['private_key']);
-
-		if (isset($options['pdf']) && $options['pdf']) {
-			$data['pdf'] = $invoice->pdf($data['qr'], $data['signedInvoice']);
-		}
-
-		return $data;
+		return $invoice->sign($certificate, $this->unit['private_key'], $options);
 	}
 
 
