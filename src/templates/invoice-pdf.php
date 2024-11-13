@@ -158,7 +158,11 @@ function symmetricTableStyles($selector, $repeat = 1)
 <body>
 	<h1 class="title">
 		<span>Tax Invoice</span>
-		-
+		<?php if ($hasLogo): ?>
+			<img src="var:logo" alt="Logo" height="100px" style="vertical-align: middle;" />
+		<?php else: ?>
+			<span> - </span>
+		<?php endif; ?>
 		<span>الفاتورة الضريبية</span>
 	</h1>
 

@@ -216,8 +216,10 @@ class Invoice
 			"qr" => $qr,
 		];
 
-		if (isset($options['pdf']) && $options['pdf']) {
-			$result['pdf'] = $this->pdf($result['qr'], $result['signedInvoice']);
+		if (isset($options['pdf']) && $options['pdf'] !== false) {
+			$pdfOptions = $options['pdf'] === true ? [] : $options['pdf'];
+
+			$result['pdf'] = $this->pdf($result['qr'], $result['signedInvoice'], $pdfOptions);
 		}
 
 		return $result;
@@ -248,14 +250,16 @@ class Invoice
 	}
 
 
-	private function pdf($qr, $xml)
+	private function pdf($qr, $xml, $options)
 	{
 		$qrCode = new QrCode($qr);
 		$qrOutput = new Output\Png();
 
 		$pdfRender = Template::render('invoice-pdf', [
 			"invoice" => $this,
-			"qr" => "data:image/png;base64," . base64_encode($qrOutput->output($qrCode, 124))
+			"qr" => "data:image/png;base64," . base64_encode($qrOutput->output($qrCode, 124)),
+
+			"hasLogo" => $hasLogo = isset($options['logo']) ? !!$options['logo'] : false,
 		]);
 
 		$mpdf = new Mpdf([
@@ -269,6 +273,10 @@ class Invoice
 		$mpdf->keep_table_proportions = true;
 		$mpdf->packTableData = true;
 		$mpdf->shrink_tables_to_fit = 1;
+
+		if ($hasLogo) {
+			$mpdf->imageVars['logo'] = file_get_contents($options['logo']);
+		}
 
 		$mpdf->WriteHTML($pdfRender);
 
