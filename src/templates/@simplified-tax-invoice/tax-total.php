@@ -1,5 +1,8 @@
 <?php
 
+use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
+use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
+use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
 
 $subTotals = [];
@@ -7,22 +10,19 @@ $subTotals = [];
 
 $taxesTotal = 0;
 foreach ($LINE_ITEMS as $lineItem) {
-	$totalLineItemDiscount = array_reduce($lineItem['discounts'] ?? [], static function ($p, $c) {
-		return $p + $c['amount'];
-	}, 0);
-	$taxableAmount = ($lineItem['tax_exclusive_price'] * $lineItem['quantity']) - ($totalLineItemDiscount ?? 0);
+	$totalLineItemDiscount = getLineItemDiscounts($lineItem);
+	$taxableAmount = getLineItemSubtotal($lineItem);
+	$taxAmount = getLineItemTaxes($lineItem);
 
-	$taxAmount = ((float)$lineItem['vat_percent']) * ((float)$taxableAmount);
 	$subTotals[] = [$taxableAmount, $taxAmount, $lineItem['vat_percent']];
-
 
 	$taxesTotal += $taxAmount;
 
-	foreach ($lineItem['other_taxes'] ?? [] as $tax) {
-		$taxAmount = $tax['percent_amount'] * $taxableAmount;
-		$subTotals[] = [$taxableAmount, $taxAmount, $tax['percent_amount']];
-		$taxesTotal += $taxAmount;
-	}
+	// foreach ($lineItem['other_taxes'] ?? [] as $tax) {
+	// 	$taxAmount = $tax['percent_amount'] * $taxableAmount;
+	// 	$subTotals[] = [$taxableAmount, $taxAmount, $tax['percent_amount']];
+	// 	$taxesTotal += $taxAmount;
+	// }
 }
 // BT-110
 $taxesTotal = zatcaNumberFormat($taxesTotal);

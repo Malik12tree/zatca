@@ -23,5 +23,9 @@
             "src/Utils/functions.php"
         ]
     },
-    "require": {}
+    "require": {
+        "dompdf/dompdf": "^3.0",
+        "mpdf/mpdf": "8.2.4",
+        "mpdf/qrcode": "1.2.1"
+    }
 }

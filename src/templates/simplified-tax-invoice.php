@@ -4,19 +4,15 @@
 
 use Malik12tree\ZATCA\Utils\Rendering\Template;
 
-$totalTaxes = 0;
-$totalSubtotal = 0;
+$totalTaxes = $invoice->computeTotalTaxes();
+$totalSubtotal = $invoice->computeTotalSubtotal();
 
 $lineItemsRender = '';
 
 foreach ($LINE_ITEMS as $lineItem) {
-
-  list($lineItemRender, $lineItemTotals) = Template::render('@simplified-tax-invoice/line-item', [
+  $lineItemRender = Template::render('@simplified-tax-invoice/line-item', [
     'LINE_ITEM' => $lineItem
-  ], true);
-
-  $totalTaxes += $lineItemTotals['taxes_total'];
-  $totalSubtotal += (float)$lineItemTotals['subtotal'];
+  ]);
 
   $lineItemsRender .= $lineItemRender;
   $lineItemsRender .= "\n";

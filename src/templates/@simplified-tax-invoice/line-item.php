@@ -1,20 +1,17 @@
 <?php
 
+use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
+use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
+use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
 
-$lineItemTotalDiscounts = 0;
-foreach ($LINE_ITEM['discounts'] ?? [] as $discount) {
-	$lineItemTotalDiscounts += $discount['amount'];
-}
+$lineItemTotalDiscounts = getLineItemDiscounts($LINE_ITEM);
+$lineItemSubtotal = getLineItemSubtotal($LINE_ITEM);
+$lineItemTotalTaxes = getLineItemTaxes($LINE_ITEM);
 
-$lineItemSubtotal = ($LINE_ITEM['tax_exclusive_price'] * $LINE_ITEM['quantity']) - $lineItemTotalDiscounts;
-
-// BR-KSA-DEC-02
-$lineItemTotalTaxes = $lineItemSubtotal * $LINE_ITEM['vat_percent'];
-
-foreach ($LINE_ITEM['other_taxes'] ?? [] as $tax) {
-	$lineItemTotalTaxes += floatval($tax['percent_amount']) * $lineItemSubtotal;
-}
+// foreach ($LINE_ITEM['other_taxes'] ?? [] as $tax) {
+// 	$lineItemTotalTaxes += floatval($tax['percent_amount']) * $lineItemSubtotal;
+// }
 
 ?>
 <cac:InvoiceLine>
@@ -44,15 +41,15 @@ foreach ($LINE_ITEM['other_taxes'] ?? [] as $tax) {
 			</cac:TaxScheme>
 		</cac:ClassifiedTaxCategory>
 
-		<?php foreach ($LINE_ITEM['other_taxes'] ?? [] as $tax): ?>
-			<cac:ClassifiedTaxCategory>
+		<?php /* foreach ($LINE_ITEM['other_taxes'] ?? [] as $tax): */ ?>
+		<?php /* <cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
-				<cbc:Percent><?= zatcaNumberFormat($tax['percent_amount'] * 100) ?></cbc:Percent>
+				<cbc:Percent><? /* = zatcaNumberFormat($tax['percent_amount'] * 100) *!/ ?></cbc:Percent>
 				<cac:TaxScheme>
 					<cbc:ID>VAT</cbc:ID>
 				</cac:TaxScheme>
-			</cac:ClassifiedTaxCategory>
-		<?php endforeach; ?>
+			</cac:ClassifiedTaxCategory> */ ?>
+		<?php /* endforeach; */ ?>
 	</cac:Item>
 
 	<cac:Price>
