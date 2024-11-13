@@ -9,16 +9,15 @@ class TLV
 	public static function encode($tag, $value)
 	{
 		$value = strval($value);
-		$length = strlen($value);
 
-		// TODO: Test if length should be calculated by UTF-8 length or by byte length
+		$valueHex = $value;
+		$length = strlen($valueHex);
 		if ($length > 0xFF) {
 			throw new Exception("Data field '$value' is too long! (max: 255)");
 		}
 
 		$tagHex = chr($tag);
 		$lengthHex = chr($length);
-		$valueHex = mb_convert_encoding($value, "UTF-8");
 
 		return "$tagHex$lengthHex$valueHex";
 	}
@@ -30,5 +29,18 @@ class TLV
 		}
 
 		return $hex;
+	}
+	public static function decode($hex)
+	{
+		$valueByTag = [];
+		for ($i = 0; $i < strlen($hex); $i += $length + 2) {
+			$tag = ord($hex[$i]);
+			$length = ord($hex[$i + 1]);
+			$value = substr($hex, $i + 2, $length);
+
+			$valueByTag[$tag] = $value;
+		}
+
+		return $valueByTag;
 	}
 }

@@ -50,6 +50,7 @@ class API
 			CURLOPT_CUSTOMREQUEST => 'POST',
 			CURLOPT_POSTFIELDS => json_encode($data),
 			CURLOPT_HTTPHEADER => $headers,
+			CURLOPT_SSL_VERIFYPEER => false
 		));
 
 		$response = curl_exec($curl);
@@ -114,10 +115,11 @@ class API
 			'/production/csids',
 			[
 				'Accept-Version: ' . API::VERSION,
+				'Content-Type: application/json',
 				...$this->getAuthHeaders($certificate, $secret)
 			],
 			[
-				'compliance_request_id' => base64_encode($complianceRequestId),
+				'compliance_request_id' => $complianceRequestId,
 			],
 			'E_PRODUCTION_CERTIFICATE'
 		);
@@ -139,6 +141,7 @@ class API
 			[
 				'Accept-Version: ' . API::VERSION,
 				"Accept-Language: en",
+				'Content-Type: application/json',
 				"Clearance-Status: 0",
 				...$this->getAuthHeaders($certificate, $secret)
 			],

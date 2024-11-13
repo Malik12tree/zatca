@@ -24,14 +24,14 @@ class EGS
 
 	public function generateNewKeysAndCSR($solutionName)
 	{
-		$privateKey = Crypto::generateSecp256k1KeyPair()[0];
+		$privateKey = Crypto::generateSecp256k1KeyPair();
 
 		$csrConfigFile = tmpfile();
 		$csrConfig = Template::render('csr', [
 			'PRODUCTION_VALUE' => "PREZATCA-Code-Signing",
 			'EGS_SERIAL_NUMBER' => "1-$solutionName|2-{$this->unit['model']}|3-{$this->unit['uuid']}",
 			'VAT_REGISTRATION_NUMBER' => $this->unit['vat_number'],
-			'BRANCH_LOCATION' => "{$this->unit['location']['building']} {$this->unit['location']['street']} {$this->unit['location']['city']}",
+			'BRANCH_LOCATION' => "{$this->unit['location']['building']} {$this->unit['location']['street']}, {$this->unit['location']['city']}",
 			'BRANCH_INDUSTRY' => $this->unit['branch_industry'],
 			'BRANCH_NAME' => $this->unit['branch_name'],
 			'TAXPAYER_NAME' => $this->unit['vat_name'],
@@ -41,11 +41,20 @@ class EGS
 		]);
 
 		fwrite($csrConfigFile, $csrConfig);
+		$csrRes = openssl_csr_new(
+			[
+				"commonName" => $this->unit['common_name'],
+				"organizationalUnitName" => $this->unit['branch_name'],
+				"organizationName" => $this->unit['vat_name'],
+				"countryName" => "SA",
+			],
+			$privateKey[2],
+			["config" => stream_get_meta_data($csrConfigFile)['uri']],
+		);
+		openssl_csr_export($csrRes, $csr);
 		fclose($csrConfigFile);
 
-		$csr = Crypto::generateEcdsaWithSHA256($csrConfigFile)[0];
-
-		$this->unit['private_key'] = Crypto::setCertificateTitle($privateKey, "EC PRIVATE KEY");
+		$this->unit['private_key'] = Crypto::setCertificateTitle($privateKey[0], "EC PRIVATE KEY");
 		$this->unit['csr'] = Crypto::setCertificateTitle($csr, "CERTIFICATE REQUEST");
 	}
 
@@ -146,8 +155,7 @@ class EGS
 						"invoice_serial_number" => Crypto::uuid4(),
 						"issue_date" => date('Y-m-d'),
 						"issue_time" => date('H:i:s'),
-						"previous_invoice_hash" => '',
-
+						"previous_invoice_hash" => Invoice::INITIAL_PREVIOUS_HASH,
 						"line_items" => [
 							[
 								"id" => "dummy",

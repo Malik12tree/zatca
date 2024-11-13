@@ -1,6 +1,7 @@
 <?php
 
 echo <<<INI
+
 # ------------------------------------------------------------------
 # Default section for "req" command options
 # ------------------------------------------------------------------
@@ -53,4 +54,5 @@ organizationName = $TAXPAYER_NAME
 
 # ISO2 country code is required with US as default
 countryName = SA
+
 INI;

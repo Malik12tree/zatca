@@ -17,11 +17,11 @@ class Crypto
 	}
 	public static function hashSHA256($data)
 	{
-		return hash('sha256', $data);
+		return hash('sha256', $data, true);
 	}
 	public static function hashSHA256HighNibble($data)
 	{
-		return pack('H*', hash('sha256', $data));
+		return pack('H*', hash('sha256', $data, true));
 	}
 	public static function signSHA256($data, $privateKey)
 	{
@@ -39,18 +39,7 @@ class Crypto
 
 		openssl_pkey_export($res, $privateKey);
 		$publicKey = openssl_pkey_get_details($res)['key'];
-		return [$privateKey, $publicKey];
-	}
-	public static function generateEcdsaWithSHA256($config = null)
-	{
-		$res = openssl_pkey_new([
-			'config' => $config || getenv('OPENSSL_CONF'),
-			'default_md' => "sha256",
-		]);
-
-		openssl_pkey_export($res, $privateKey);
-		$publicKey = openssl_pkey_get_details($res)['key'];
-		return [$privateKey, $publicKey];
+		return [$privateKey, $publicKey, $res];
 	}
 
 	public static function getCertificateSignature($certificate)
@@ -61,7 +50,7 @@ class Crypto
 		$out = explode('Signature Algorithm:', $out);
 		$out = explode('-----BEGIN CERTIFICATE-----', $out[2]);
 		$out = explode("\n", $out[0]);
-		$out = $out[1] . $out[2] . $out[3] . $out[4];
+		$out = $out[1] . $out[2] . $out[3] . $out[4] . $out[5];
 		$out = str_replace([':', ' ', 'SignatureValue'], '', $out);
 
 		return pack('H*', $out);
@@ -69,9 +58,9 @@ class Crypto
 	public static function getCertificateInfo($certificate)
 	{
 		$certificate = Crypto::setCertificateTitle($certificate, "CERTIFICATE");
-		$certificateHash = base64_encode(Crypto::hashSHA256($certificate));
+		$certificateHash = openssl_x509_fingerprint($certificate, 'sha256');
 
-		/** @var any */
+		/** @var mixed */
 		$x509 = openssl_x509_parse($certificate);
 
 		$res = openssl_get_publickey($certificate);
@@ -80,7 +69,7 @@ class Crypto
 		$issuer = "CN=" . implode(', ', array_reverse($x509['issuer']));
 		$serialNumber = $x509['serialNumber'];
 
-		$publicKey = Crypto::cleanCertificate($cert['key']);
+		$publicKey = base64_decode(Crypto::cleanCertificate($cert['key']));
 
 		$signature = Crypto::getCertificateSignature($certificate);
 

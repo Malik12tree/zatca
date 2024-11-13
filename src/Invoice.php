@@ -19,6 +19,8 @@ use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 
 class Invoice
 {
+	/* BR-KSA-26 */
+	const INITIAL_PREVIOUS_HASH = "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
 	private $invoiceXML;
 
 	private $egsUnit;
@@ -57,7 +59,7 @@ class Invoice
 			Template::render('simplified-tax-invoice', [
 				"invoice" => $this,
 				"EGS_INFO" => $data["egs_info"],
-				"CUSTOMER_INFO" => $data["customer_info"] ?? [],
+				"CUSTOMER_INFO" => $this->customerInfo,
 				"LINE_ITEMS" => $data["line_items"] ?? [],
 				"INVOICE_SERIAL_NUMBER" => $data["invoice_serial_number"],
 				"ISSUE_DATE" => $data["issue_date"],
@@ -75,6 +77,7 @@ class Invoice
 				"LATEST_DELIVERY_DATE" => isset($data["latest_delivery_date"]) ? $data["latest_delivery_date"] : null,
 				"PAYMENT_METHOD" => isset($data["payment_method"]) ? $data["payment_method"] : null
 			], true);
+		$this->invoiceXML = str_replace("\r\n", "\n", $this->invoiceXML);
 	}
 
 	public function getVATNumber()
@@ -233,7 +236,7 @@ class Invoice
 
 		$cleanInvoice = $this->cleanedXML();
 
-		$hash = Crypto::hashSHA256HighNibble(trim($cleanInvoice));
+		$hash = Crypto::hashSHA256($cleanInvoice);
 		$this->cachedHash = base64_encode($hash);
 
 		return $this->cachedHash;
@@ -246,7 +249,7 @@ class Invoice
 
 		$digitalSignature = base64_encode(Crypto::signSHA256($invoiceHash, $privateKey));
 
-		$qr = $this->qr($digitalSignature, $certificateInfo["publicKey"], $certificateInfo["signature"]);
+		$qr = $this->qr($digitalSignature, $certificateInfo["publicKey"], $certificateInfo['signature']);
 
 		$ublPropertiesVariables = [
 			"SIGN_TIMESTAMP" => date('Y-m-d\TH:i:s\Z'),
@@ -291,7 +294,7 @@ class Invoice
 		$vatNumber = $this->vatNumber;
 		$total = $this->total;
 		$vatTotal = $this->totalTax;
-		$dateTime = date('Y-m-d\TH:i:s\Z', strtotime("{$this->issueDate} {$this->issueTime}"));
+		$dateTime = date('Y-m-d\TH:i:s', strtotime("{$this->issueDate} {$this->issueTime}"));
 
 		$qrTLV = TLV::encodeAll([
 			0x01 => $sellerName,
@@ -323,22 +326,16 @@ class Invoice
 		if ($element = $document->getElementsByTagName('AdditionalDocumentReference')->item(2))
 			$element->remove();
 
-		return str_replace(
+		$cleanXML = str_replace(
 			[
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
-				"<cbc:ProfileID>",
-				"<cac:AccountingSupplierParty>"
 			],
 			[
 				"",
-				// https://github.com/Repzo/zatca-xml-js/blob/9a9045eff227c58fde27c96dd939a636f5d8a26b/src/zatca/signing/index.ts#L44-L50
-				// A dumb workaround for whatever reason ZATCA XML devs decided
-				// to include those trailing spaces and a newlines.
-				// (without it the hash is incorrect)
-				"\n    <cbc:ProfileID>",
-				"\n    \n    <cac:AccountingSupplierParty>"
 			],
-			$document->saveXML()
+			$document->saveXML(null, LIBXML_NOEMPTYTAG)
 		);
+		$cleanXML = trim($cleanXML);
+		return $cleanXML;
 	}
 }
