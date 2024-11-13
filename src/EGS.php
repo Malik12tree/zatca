@@ -103,13 +103,19 @@ class EGS
 	/**
 	 * @param Invoice $invoice
 	 */
-	public function signInvoice($invoice)
+	public function signInvoice($invoice, $options = [])
 	{
 		$certificate =  $this->isProduction ? $this->unit['production_certificate'] : $this->unit['compliance_certificate'];
 
 		if (!$certificate || !$this->unit['private_key']) throw new Exception("EGS is missing a certificate/private key to sign the invoice.");
 
-		return $invoice->sign($certificate, $this->unit['private_key']);
+		$data = $invoice->sign($certificate, $this->unit['private_key']);
+
+		if (isset($options['pdf']) && $options['pdf']) {
+			$data['pdf'] = $invoice->pdf($data['qr'], $data['signedInvoice']);
+		}
+
+		return $data;
 	}
 
 

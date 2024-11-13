@@ -3,8 +3,6 @@
 namespace Malik12tree\ZATCA;
 
 use DOMDocument;
-use Dompdf\Cpdf;
-use Dompdf\Dompdf;
 
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 use Malik12tree\ZATCA\Utils\Encoding\TLV;
@@ -162,44 +160,15 @@ class Invoice
 		return $name;
 	}
 
-	public function pdf($path)
+	public function pdf($qr, $xml)
 	{
-		$domPDF = new Dompdf();
-
-		$pdfRender = mb_convert_encoding(Template::render('invoice-pdf', [
-			"invoice" => $this,
-		]), 'UTF-8', 'ISO-8859-1');
-		$domPDF->loadHtml($pdfRender);
-
-		$domPDF->setPaper('letter', 'landscape');
-		$domPDF->render();
-
-		/** @var Cpdf $cpdf */
-		$cpdf = $domPDF->getCanvas()->get_cpdf();
-
-		// TODO: Add invoice.xml to the PDF
-		// $cpdf->addEmbeddedFile(
-		// 	__DIR__ . '/invoice.xml',
-		// 	'invoice.xml',
-		// 	''
-		// );
-
-		file_put_contents(
-			$path . '/' . $this->attachmentName('pdf'),
-			$domPDF->output()
-		);
-	}
-	public function mpdf($path)
-	{
-
-		$qrCode = new QrCode(random_bytes(256));
+		$qrCode = new QrCode($qr);
 		$qrOutput = new Output\Png();
 
 		$pdfRender = Template::render('invoice-pdf', [
 			"invoice" => $this,
 			"qr" => "data:image/png;base64," . base64_encode($qrOutput->output($qrCode, 124))
 		]);
-		// $pdfRender = mb_convert_encoding($pdfRender, 'UTF-8', 'ISO-8859-1');
 
 		$mpdf = new Mpdf([
 			'PDFA' => true,
@@ -215,19 +184,21 @@ class Invoice
 
 		$mpdf->WriteHTML($pdfRender);
 
+		$tmpXml = tmpfile();
+		fwrite($tmpXml, $xml);
+
 		$mpdf->SetAssociatedFiles([[
 			'name' => $this->attachmentName('xml'),
 			'mime' => 'text/xml',
 			'description' => '',
 			'AFRelationship' => 'Alternative',
-			'path' => $path . '/../' . 'invoice.xml',
+			'path' => stream_get_meta_data($tmpXml)['uri'],
 		]]);
 
+		$data = $mpdf->OutputBinaryData();
+		fclose($tmpXml);
 
-		file_put_contents(
-			$path . '/' . 'pdf.pdf', //$this->attachmentName('pdf'),
-			$mpdf->OutputBinaryData()
-		);
+		return $data;
 	}
 
 	public function hash()
