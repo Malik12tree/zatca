@@ -13,8 +13,8 @@ use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
 $invoice;
 
 $tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%" style="overflow: wrap"';
-$UNIT = 'SAR';
-$F_UNIT = " $UNIT";
+const UNIT = 'SAR';
+const F_UNIT = " " . UNIT;
 
 $totalDiscount = 0;
 $columns = [
@@ -25,11 +25,9 @@ $columns = [
 	"tax_exclusive_price" => [/*  */
 		"en" => "Unit price",
 		"ar" => "سعر الوحدة",
-
-		"@map" => function ($value, $row) {
-			global $F_UNIT;
-
-			return zatcaNumberFormat($value) . $F_UNIT;
+ 
+		"@map" => static function ($value, $row) {
+			return zatcaNumberFormat($value) . F_UNIT;
 		}
 	],
 	"quantity" => [
@@ -40,30 +38,28 @@ $columns = [
 		"en" => "Taxable Amount",
 		"ar" => "المبلغ الخاضع للضریبة",
 
-		"@map" => function ($value, $row) {
-			global $F_UNIT;
-			return zatcaNumberFormat(getLineItemSubtotal($row)) . $F_UNIT;
+		"@map" => static function ($value, $row) {
+			return zatcaNumberFormat(getLineItemSubtotal($row)) . F_UNIT;
 		}
 	],
 	"discount" => [
 		"en" => "Discount",
 		"ar" => "خصم",
 
-		"@map" => function ($value, $row) {
-			global $totalDiscount, $F_UNIT;
+		"@map" => static function ($value, $row) {
+			global $totalDiscount;
 
 			$discount = getLineItemDiscounts($row);
 			$totalDiscount += $discount;
 
-			return zatcaNumberFormat($discount) . $F_UNIT;
+			return zatcaNumberFormat($discount) . F_UNIT;
 		}
 	],
 	"vat_percent" => [
 		"en" => "VAT Percentage",
 		"ar" => "النسبة المئوية للضريبة",
 
-		"@map" => function ($value, $row) {
-			global $F_UNIT;
+		"@map" => static function ($value, $row) {
 			return zatcaNumberFormat($value * 100) . '%';
 		}
 	],
@@ -71,18 +67,16 @@ $columns = [
 		"en" => "Tax Amount",
 		"ar" => "المبلغ الضريب",
 
-		"@map" => function ($value, $row) {
-			global $F_UNIT;
-			return zatcaNumberFormat(getLineItemTaxes($row)) . $F_UNIT;
+		"@map" => static function ($value, $row) {
+			return zatcaNumberFormat(getLineItemTaxes($row)) . F_UNIT;
 		}
 	],
 	"total" => [
 		"en" => "Item Subtotal (Including VAT)",
 		"ar" => "ضریبة القیمة المضافة) الفرعي للبند (متضمنـًا المجموع",
 
-		"@map" => function ($value, $row) {
-			global $F_UNIT;
-			return zatcaNumberFormat(getLineItemTotal($row)) . $F_UNIT;
+		"@map" => static function ($value, $row) {
+			return zatcaNumberFormat(getLineItemTotal($row)) . F_UNIT;
 		}
 	]
 ];
@@ -350,27 +344,27 @@ function symmetricTableStyles($selector, $repeat = 1)
 		<tbody>
 			<tr>
 				<td>Total (Excluding VAT)</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()) ?><?= $F_UNIT ?></td>
+				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()) ?><?= F_UNIT ?></td>
 				<td>الإجمالي (باستثناء ضریبة القیمة المضافة)</td>
 			</tr>
 			<tr>
 				<td>Discounts</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalDiscounts()) ?><?= $F_UNIT ?></td>
+				<td><?= zatcaNumberFormat($invoice->computeTotalDiscounts()) ?><?= F_UNIT ?></td>
 				<td>مجموع الخصومات</td>
 			</tr>
 			<tr>
 				<td>Total Taxable Amount (Excluding VAT)</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()) ?><?= $F_UNIT ?></td>
+				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()) ?><?= F_UNIT ?></td>
 				<td>المبلغ الخاضع للضریبة (باستثناء ضریبة القیمة المضافة إجمالي)</td>
 			</tr>
 			<tr>
 				<td>Total VAT</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalTaxes()) ?><?= $F_UNIT ?></td>
+				<td><?= zatcaNumberFormat($invoice->computeTotalTaxes()) ?><?= F_UNIT ?></td>
 				<td>الضريبة المضافة</td>
 			</tr>
 			<tr>
 				<td>Total Amount Due</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotal()) ?><?= $F_UNIT ?></td>
+				<td><?= zatcaNumberFormat($invoice->computeTotal()) ?><?= F_UNIT ?></td>
 				<td>إجمالي المبلغ المستحق</td>
 			</tr>
 		</tbody>
