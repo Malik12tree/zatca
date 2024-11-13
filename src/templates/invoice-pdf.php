@@ -345,7 +345,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 			<tr>
 				<td>Total (Excluding VAT)</td>
 				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()) ?><?= F_UNIT ?></td>
-				<td>الإجمالي (باستثناء ضریبة القیمة المضافة)</td>
+				<td>الإجمالي (باستثناء ضريبة القيمة المضافة)&rlm;</td>
 			</tr>
 			<tr>
 				<td>Discounts</td>
@@ -355,7 +355,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 			<tr>
 				<td>Total Taxable Amount (Excluding VAT)</td>
 				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()) ?><?= F_UNIT ?></td>
-				<td>المبلغ الخاضع للضریبة (باستثناء ضریبة القیمة المضافة إجمالي)</td>
+				<td>المبلغ الخاضع للضریبة (باستثناء ضریبة القیمة المضافة إجمالي)&rlm;</td>
 			</tr>
 			<tr>
 				<td>Total VAT</td>
