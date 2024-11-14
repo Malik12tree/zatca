@@ -193,7 +193,7 @@ class Invoice
 		$ublSignaturePropertiesRenderForSigning =
 			Template::render('@simplified-tax-invoice/ubl-signature/properties/for-signing', $ublPropertiesVariables);
 
-		$signedUBLSignaturePropertiesRender = base64_encode(Crypto::hashSHA256($ublSignaturePropertiesRenderForSigning));
+		$signedUBLSignaturePropertiesRender = base64_encode(bin2hex(Crypto::hashSHA256($ublSignaturePropertiesRenderForSigning)));
 
 		$ublSignatureRender = Template::render('@simplified-tax-invoice/ubl-signature', [
 			"INVOICE_HASH" => $invoiceHash,
