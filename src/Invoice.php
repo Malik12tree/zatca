@@ -153,7 +153,7 @@ class Invoice
 	}
 	public function attachmentName($extension = '')
 	{
-		$name = "{$this->vatNumber}_" . date('Ymd\THis', strtotime("{$this->issueDate} {$this->issueTime}")) . "{$this->invoiceSerialNumber}";
+		$name = "{$this->vatNumber}_" . date('Ymd\THis', strtotime("{$this->issueDate} {$this->issueTime}")) . "_{$this->invoiceSerialNumber}";
 		if ($extension) {
 			$name .= ".{$extension}";
 		}
