@@ -19,8 +19,8 @@ const F_UNIT = " " . UNIT;
 $totalDiscount = 0;
 $columns = [
 	"name" => [
-		"en" => "Nature of goods or services",
-		"ar" => "طبیعة السلع أو الخدمات"
+		"en" => "Goods and Services",
+		"ar" => "السلع والخدمات"
 	],
 	"tax_exclusive_price" => [/*  */
 		"en" => "Unit price",
@@ -32,7 +32,7 @@ $columns = [
 	],
 	"quantity" => [
 		"en" => "Quantity",
-		"ar" => "كمية"
+		"ar" => "الكمية"
 	],
 	"taxable_amount" => [
 		"en" => "Taxable Amount",
@@ -44,7 +44,7 @@ $columns = [
 	],
 	"discount" => [
 		"en" => "Discount",
-		"ar" => "خصم",
+		"ar" => "خصومات",
 
 		"@map" => static function ($value, $row) {
 			global $totalDiscount;
@@ -57,7 +57,7 @@ $columns = [
 	],
 	"vat_percent" => [
 		"en" => "VAT Percentage",
-		"ar" => "النسبة المئوية للضريبة",
+		"ar" => "نسبة للضريبة",
 
 		"@map" => static function ($value, $row) {
 			return zatcaNumberFormat($value * 100) . '%';
@@ -65,15 +65,15 @@ $columns = [
 	],
 	"tax_amount" => [
 		"en" => "Tax Amount",
-		"ar" => "المبلغ الضريب",
+		"ar" => "مبلغ الضريبة",
 
 		"@map" => static function ($value, $row) {
 			return zatcaNumberFormat(getLineItemTaxes($row)) . F_UNIT;
 		}
 	],
 	"total" => [
-		"en" => "Item Subtotal (Including VAT)",
-		"ar" => "ضریبة القیمة المضافة) الفرعي للبند (متضمنـًا المجموع",
+		"en" => "Subtotal (Including VAT)",
+		"ar" => "مجموع شامل الضريبة",
 
 		"@map" => static function ($value, $row) {
 			return zatcaNumberFormat(getLineItemTotal($row)) . F_UNIT;
@@ -133,9 +133,6 @@ function symmetricTableStyles($selector, $repeat = 1)
 			width: 16.66%;
 		}
 
-		.line_items tbody td {
-			width: 12.5%;
-		}
 
 		.line_items td {
 			text-align: center;
