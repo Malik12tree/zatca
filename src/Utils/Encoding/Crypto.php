@@ -57,8 +57,8 @@ class Crypto
 	}
 	public static function getCertificateInfo($certificate)
 	{
-		$certificate = Crypto::setCertificateTitle($certificate, "CERTIFICATE");
-		$certificateHash = openssl_x509_fingerprint($certificate, 'sha256');
+		$certificate = self::setCertificateTitle($certificate, "CERTIFICATE");
+		$certificateHash = base64_encode(bin2hex(self::hashSHA256(self::cleanCertificate($certificate))));
 
 		/** @var mixed */
 		$x509 = openssl_x509_parse($certificate);
@@ -69,9 +69,9 @@ class Crypto
 		$issuer = "CN=" . implode(', ', array_reverse($x509['issuer']));
 		$serialNumber = $x509['serialNumber'];
 
-		$publicKey = base64_decode(Crypto::cleanCertificate($cert['key']));
+		$publicKey = base64_decode(self::cleanCertificate($cert['key']));
 
-		$signature = Crypto::getCertificateSignature($certificate);
+		$signature = self::getCertificateSignature($certificate);
 
 		return [
 			"hash" => $certificateHash,
