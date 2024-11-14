@@ -136,6 +136,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 
 		.line_items td {
 			text-align: center;
+			width: 12.5%;
 		}
 
 		.totals tbody td {
