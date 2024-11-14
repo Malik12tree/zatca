@@ -2,6 +2,7 @@
 
 namespace Malik12tree\ZATCA\Utils;
 
+use Exception;
 use Malik12tree\ZATCA\Exceptions\APIException;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 
@@ -18,7 +19,13 @@ class API
 	private $url;
 	public function __construct($env = "sandbox")
 	{
+		if (!self::isEnvValid($env)) throw new Exception("EGS Environment is not valid. Valid environments are " . implode(" | ", array_keys(API::APIS)));
 		$this->url = API::APIS[$env];
+	}
+
+	public static function isEnvValid($env)
+	{
+		return array_key_exists($env, API::APIS);
 	}
 
 	private function getAuthHeaders($certificate, $secret)

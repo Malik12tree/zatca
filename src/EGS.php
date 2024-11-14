@@ -10,16 +10,38 @@ use Malik12tree\ZATCA\EGSDatabase;
 
 class EGS
 {
+	private static $env = null;
 	private $api;
 	private $unit;
 	private $isProduction;
 	/** @var EGSDatabase|null */
 	private $database;
-	public function __construct($unit, $env = "sandbox")
+	public function __construct($unit)
 	{
+		if (self::$env == null) throw new Exception("EGS Environment is not set. Use EGS::setEnv() to set it.");
+
 		$this->unit = $unit;
-		$this->api = new API($env);
-		$this->isProduction = $env == "production";
+		$this->api = new API(self::$env);
+		$this->isProduction = self::$env == "production";
+	}
+
+	public static function setEnv($env)
+	{
+		if (self::$env != null) throw new Exception("EGS Environment is already set.");
+		if (!API::isEnvValid($env)) throw new Exception("EGS Environment is not valid. Valid environments are " . implode(" | ", array_keys(API::APIS)));
+		self::$env = $env;
+	}
+	public static function getEnv()
+	{
+		return self::$env;
+	}
+	/**
+	 * @return bool|null true if production, false if sandbox or simulation, null if not set.
+	 */
+	public static function isProduction()
+	{
+		if (self::$env == null) return null;
+		return self::$env == "production";
 	}
 
 	public function generateNewKeysAndCSR($solutionName)
