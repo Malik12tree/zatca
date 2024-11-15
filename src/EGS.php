@@ -7,6 +7,7 @@ use Malik12tree\ZATCA\Utils\API;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
 use Malik12tree\ZATCA\EGSDatabase;
+use Malik12tree\ZATCA\Invoice\SignedInvoice;
 
 class EGS
 {
@@ -107,15 +108,18 @@ class EGS
 		return $res->request_id;
 	}
 
-	public function checkInvoiceCompliance(string $signedInvoice, string $invoiceHash)
+	/**
+	 * @param SignedInvoice $signedInvoice
+	 */
+	public function checkInvoiceCompliance($signedInvoice)
 	{
 		if (!$this->unit['compliance_certificate'] || !$this->unit['compliance_api_secret']) throw new Exception('EGS is missing a certificate/private key/api secret to check the invoice compliance.');
 
 		$res = $this->api->checkInvoiceCompliance(
 			$this->unit['compliance_certificate'],
 			$this->unit['compliance_api_secret'],
-			$signedInvoice,
-			$invoiceHash,
+			$signedInvoice->getSignedInvoiceXML(),
+			$signedInvoice->getInvoiceHash(),
 			$this->unit['uuid']
 		);
 
@@ -125,13 +129,13 @@ class EGS
 	/**
 	 * @param Invoice $invoice
 	 */
-	public function signInvoice($invoice, $options = [])
+	public function signInvoice($invoice)
 	{
 		$certificate =  $this->isProduction ? $this->unit['production_certificate'] : $this->unit['compliance_certificate'];
 
 		if (!$certificate || !$this->unit['private_key']) throw new Exception("EGS is missing a certificate/private key to sign the invoice.");
 
-		return $invoice->sign($certificate, $this->unit['private_key'], $options);
+		return $invoice->sign($certificate, $this->unit['private_key']);
 	}
 
 
@@ -197,11 +201,9 @@ class EGS
 					}
 
 					$invoice = new Invoice($data);
-					list(
-						"signedInvoice" => $signedInvoice,
-						"hash" => $invoiceHash,
-					) = $this->signInvoice($invoice);
-					$this->checkInvoiceCompliance($signedInvoice, $invoiceHash);
+
+					$signedInvoice = $this->signInvoice($invoice);
+					$this->checkInvoiceCompliance($signedInvoice);
 				}
 			}
 

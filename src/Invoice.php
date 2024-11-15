@@ -3,13 +3,10 @@
 namespace Malik12tree\ZATCA;
 
 use DOMDocument;
-
+use Malik12tree\ZATCA\Invoice\SignedInvoice;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 use Malik12tree\ZATCA\Utils\Encoding\TLV;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
-use Mpdf\Mpdf;
-use Mpdf\QrCode\QrCode;
-use Mpdf\QrCode\Output;
 
 use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
@@ -172,7 +169,7 @@ class Invoice
 		return $this->cachedHash;
 	}
 
-	public function sign($certificate, $privateKey, $options = [])
+	public function sign($certificate, $privateKey)
 	{
 		$invoiceHash = $this->hash();
 		$certificateInfo = Crypto::getCertificateInfo($certificate);
@@ -210,19 +207,7 @@ class Invoice
 			$invoiceRender
 		);
 
-		$result = [
-			"signedInvoice" => $invoiceRender,
-			"hash" => $invoiceHash,
-			"qr" => $qr,
-		];
-
-		if (isset($options['pdf']) && $options['pdf'] !== false) {
-			$pdfOptions = $options['pdf'] === true ? [] : $options['pdf'];
-
-			$result['pdf'] = $this->pdf($result['qr'], $result['signedInvoice'], $pdfOptions);
-		}
-
-		return $result;
+		return new SignedInvoice($this, $invoiceRender, $invoiceHash, $qr);
 	}
 
 
@@ -247,54 +232,6 @@ class Invoice
 		]);
 
 		return base64_encode($qrTLV);
-	}
-
-
-	private function pdf($qr, $xml, $options)
-	{
-		$qrCode = new QrCode($qr);
-		$qrOutput = new Output\Png();
-
-		$pdfRender = Template::render('invoice-pdf', [
-			"invoice" => $this,
-			"qr" => "data:image/png;base64," . base64_encode($qrOutput->output($qrCode, 124)),
-
-			"hasLogo" => $hasLogo = isset($options['logo']) ? !!$options['logo'] : false,
-		]);
-
-		$mpdf = new Mpdf([
-			'PDFA' => true,
-			'PDFAauto' => true,
-		]);
-		$mpdf->autoScriptToLang = true;
-		$mpdf->autoLangToFont = true;
-		$mpdf->SetDefaultFontSize(7);
-		$mpdf->simpleTables = true;
-		$mpdf->keep_table_proportions = true;
-		$mpdf->packTableData = true;
-		$mpdf->shrink_tables_to_fit = 1;
-
-		if ($hasLogo) {
-			$mpdf->imageVars['logo'] = file_get_contents($options['logo']);
-		}
-
-		$mpdf->WriteHTML($pdfRender);
-
-		$tmpXml = tmpfile();
-		fwrite($tmpXml, $xml);
-
-		$mpdf->SetAssociatedFiles([[
-			'name' => $this->attachmentName('xml'),
-			'mime' => 'text/xml',
-			'description' => '',
-			'AFRelationship' => 'Alternative',
-			'path' => stream_get_meta_data($tmpXml)['uri'],
-		]]);
-
-		$data = $mpdf->OutputBinaryData();
-		fclose($tmpXml);
-
-		return $data;
 	}
 
 
