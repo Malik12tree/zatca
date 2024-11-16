@@ -137,6 +137,22 @@ class EGS
 
 		return $invoice->sign($certificate, $this->unit['private_key']);
 	}
+	/**
+	 * @param SignedInvoice $signedInvoice
+	 */
+	public function reportInvoice($signedInvoice)
+	{
+		if (!$this->unit['production_api_secret'] || !$this->unit['production_certificate'])
+			throw new Exception("EGS is missing a production API certificate/secret to report the invoice.");
+
+		return $this->api->reportInvoice(
+			$this->unit['production_certificate'],
+			$this->unit['production_api_secret'],
+			$signedInvoice->getSignedInvoiceXML(),
+			$signedInvoice->getInvoiceHash(),
+			$this->unit['uuid']
+		);
+	}
 
 
 	public function setDatabase($database)
