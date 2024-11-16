@@ -12,10 +12,9 @@ class Template
 			$result = call_user_func_array($callback, $args);
 		} finally {
 			$render = ob_get_clean();
-
-			if ($return) return [$render, $result];
-			return $render;
 		}
+		if ($return) return [$render, $result];
+		return $render;
 	}
 	public static function render(string $templateName, array $variables, bool $return = false)
 	{

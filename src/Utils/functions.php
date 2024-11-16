@@ -2,6 +2,9 @@
 
 namespace Malik12tree\ZATCA\Utils;
 
+use Exception;
+use Malik12tree\ZATCA\InvoiceVATCategory;
+
 if (!function_exists('zatcaNumberFormat')) {
 	function zatcaNumberFormat($number)
 	{
@@ -23,8 +26,7 @@ if (!function_exists('getLineItemDiscounts')) {
 if (!function_exists('getLineItemSubtotal')) {
 	function getLineItemSubtotal($item)
 	{
-		$discounts = getLineItemDiscounts($item);
-		return ($item['tax_exclusive_price'] * $item['quantity']) - $discounts;
+		return $item['quantity'] * ($item['tax_exclusive_price'] - getLineItemDiscounts($item));
 	}
 }
 
@@ -39,5 +41,32 @@ if (!function_exists('getLineItemTotal')) {
 	function getLineItemTotal($item)
 	{
 		return getLineItemSubtotal($item) + getLineItemTaxes($item);
+	}
+}
+
+if (!function_exists('getLineItemVATCategory')) {
+	function getLineItemVATCategory($item)
+	{
+		if ($item['vat_percent'] === 0.15 || $item['vat_percent'] === 0.05) return [
+			"percent" => (int)($item['vat_percent'] * 100),
+			"category" => "S",
+			"reason" => null,
+			"reason_code" => null,
+		];
+
+		if ($item['vat_percent'] > 0) {
+			throw new Exception("Invalid VAT Percent");
+		}
+
+		if (!InvoiceVATCategory::isValidZeroValue($item['vat_category']['category'] ?? null)) {
+			throw new Exception("Invalid VAT Category");
+		}
+
+		return [
+			"percent" => 0,
+			"category" => $item['vat_category']['category'],
+			"reason" => $item['vat_category']['reason'] ?? null,
+			"reason_code" => $item['vat_category']['reason_code'] ?? null,
+		];
 	}
 }

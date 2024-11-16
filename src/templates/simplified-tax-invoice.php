@@ -1,30 +1,19 @@
 <?php
 
-// BT-110
-
 use Malik12tree\ZATCA\Utils\Rendering\Template;
+
+use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
+use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
+use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
+use function Malik12tree\ZATCA\Utils\getLineItemVATCategory;
+use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
 
 $totalTaxes = $invoice->computeTotalTaxes();
 $totalSubtotal = $invoice->computeTotalSubtotal();
 
-$lineItemsRender = '';
-
-foreach ($LINE_ITEMS as $lineItem) {
-  $lineItemRender = Template::render('@simplified-tax-invoice/line-item', [
-    'LINE_ITEM' => $lineItem
-  ]);
-
-  $lineItemsRender .= $lineItemRender;
-  $lineItemsRender .= "\n";
-}
-
-list($taxTotalRender, $totalTax) = Template::render('@simplified-tax-invoice/tax-total', [
-  'LINE_ITEMS' => $LINE_ITEMS
-], true);
-list($legalMonetaryTotalRender, $total) = Template::render('@simplified-tax-invoice/legal-monetary-total', [
-  'TOTAL_SUBTOTAL' => $totalSubtotal,
-  'TOTAL_TAXES' => $totalTaxes
-], true);
+$taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
+    'invoice' => $invoice,
+]);
 
 ?>
 <?= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ?>
@@ -157,12 +146,12 @@ list($legalMonetaryTotalRender, $total) = Template::render('@simplified-tax-invo
 <?php endif ?>
     </cac:AccountingCustomerParty>
 <?php if (isset($ACTUAL_DELIVERY_DATE)): ?>
-        <cac:Delivery>
+    <cac:Delivery>
         <cbc:ActualDeliveryDate><?= $ACTUAL_DELIVERY_DATE ?></cbc:ActualDeliveryDate>
 <?php if (isset($LATEST_DELIVERY_DATE)): ?>
             <cbc:LatestDeliveryDate><?= $LATEST_DELIVERY_DATE ?></cbc:LatestDeliveryDate>
 <?php endif ?>
-        </cac:Delivery>
+    </cac:Delivery>
 <?php endif ?>
 <?php if (!isset($CANCELLATION)): ?>
 <?php if (isset($PAYMENT_METHOD)): ?>
@@ -177,7 +166,48 @@ list($legalMonetaryTotalRender, $total) = Template::render('@simplified-tax-invo
         </cac:PaymentMeans>
 <?php endif ?>
 <?= $taxTotalRender ?>
-<?= $legalMonetaryTotalRender ?>
-<?= $lineItemsRender ?>
+
+    <cac:LegalMonetaryTotal>
+        <cbc:LineExtensionAmount currencyID="SAR"><?= zatcaNumberFormat($totalSubtotal) ?></cbc:LineExtensionAmount>
+        <cbc:TaxExclusiveAmount currencyID="SAR"><?= zatcaNumberFormat($totalSubtotal) ?></cbc:TaxExclusiveAmount>
+        <cbc:TaxInclusiveAmount currencyID="SAR"><?= $total = zatcaNumberFormat($totalSubtotal + $totalTaxes) ?></cbc:TaxInclusiveAmount>
+        <cbc:PrepaidAmount currencyID="SAR"><?= 0 ?></cbc:PrepaidAmount>
+        <cbc:PayableAmount currencyID="SAR"><?= zatcaNumberFormat($totalSubtotal + $totalTaxes) ?></cbc:PayableAmount>
+    </cac:LegalMonetaryTotal>
+<?php foreach ($LINE_ITEMS as $lineItem) {
+    $lineItemExtension = getLineItemSubtotal($lineItem);
+    $lineItemTotalTaxes = getLineItemTaxes($lineItem);
+?>
+    <cac:InvoiceLine>
+        <cbc:ID><?= $lineItem['id'] ?></cbc:ID>
+        <cbc:InvoicedQuantity unitCode="PCE"><?= $lineItem['quantity'] ?></cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="SAR"><?= zatcaNumberFormat($lineItemExtension) ?></cbc:LineExtensionAmount>
+        <cac:TaxTotal>
+            <cbc:TaxAmount currencyID="SAR"><?= zatcaNumberFormat($lineItemTotalTaxes) ?></cbc:TaxAmount>
+            <cbc:RoundingAmount currencyID="SAR"><?= zatcaNumberFormat($lineItemExtension + $lineItemTotalTaxes) ?></cbc:RoundingAmount>
+        </cac:TaxTotal>
+        <cac:Item>
+            <cbc:Name><?= $lineItem['name'] ?></cbc:Name>
+            <cac:ClassifiedTaxCategory>
+                <cbc:ID><?= getLineItemVATCategory($lineItem)["category"] ?></cbc:ID>
+                <cbc:Percent><?= zatcaNumberFormat(($lineItem["vat_percent"] * 100)) ?></cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="SAR"><?= zatcaNumberFormat($lineItem['tax_exclusive_price'] - getLineItemDiscounts($lineItem)) ?></cbc:PriceAmount>
+<?php foreach ($lineItem['discounts'] ?? [] as $discount): ?>
+                <cac:AllowanceCharge>
+                    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+                    <cbc:AllowanceChargeReason><?= $discount['reason'] ?></cbc:AllowanceChargeReason>
+                    <cbc:Amount currencyID="SAR"><?= zatcaNumberFormat($discount['amount']) ?></cbc:Amount>
+                    <cbc:BaseAmount currencyID="SAR"><?= zatcaNumberFormat($lineItem['tax_exclusive_price']) ?></cbc:BaseAmount>
+                </cac:AllowanceCharge>
+<?php endforeach; ?>
+        </cac:Price>
+    </cac:InvoiceLine>
+<?php } ?>
 </Invoice>
-<?php return ["total" => $total, "totalTax" => $totalTax] ?>
+<?php return ["total" => $total, "totalTax" => $totalTaxes] ?>
