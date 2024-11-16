@@ -43,7 +43,7 @@ class Invoice
 		$this->invoiceSerialNumber = $data["invoice_serial_number"];
 		$this->vatNumber = $data["egs_info"]["vat_number"];
 		$this->vatName = $data["egs_info"]["vat_name"];
-		$this->deliveryDate = $data["delivery_date"] ?? null;
+		$this->deliveryDate = $data["actual_delivery_date"] ?? null;
 		$this->customerInfo = $data["customer_info"] ?? [];
 		$this->lineItems = $data["line_items"] ?? [];
 
