@@ -30,6 +30,13 @@ if (!function_exists('getLineItemSubtotal')) {
 	}
 }
 
+if (!function_exists('getLineItemSubtotalExcludingDiscount')) {
+	function getLineItemSubtotalExcludingDiscount($item)
+	{
+		return $item['quantity'] * $item['tax_exclusive_price'];
+	}
+}
+
 if (!function_exists('getLineItemTaxes')) {
 	function getLineItemTaxes($item)
 	{

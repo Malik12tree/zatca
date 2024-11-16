@@ -34,14 +34,6 @@ $columns = [
 		"en" => "Quantity",
 		"ar" => "الكمية"
 	],
-	"taxable_amount" => [
-		"en" => "Taxable Amount",
-		"ar" => "المبلغ الخاضع للضریبة",
-
-		"@map" => static function ($value, $row) {
-			return zatcaNumberFormat(getLineItemSubtotal($row)) . F_UNIT;
-		}
-	],
 	"discount" => [
 		"en" => "Discount",
 		"ar" => "خصومات",
@@ -53,6 +45,14 @@ $columns = [
 			$totalDiscount += $discount;
 
 			return zatcaNumberFormat($discount) . F_UNIT;
+		}
+	],
+	"taxable_amount" => [
+		"en" => "Taxable Amount",
+		"ar" => "المبلغ الخاضع للضریبة",
+
+		"@map" => static function ($value, $row) {
+			return zatcaNumberFormat(getLineItemSubtotal($row)) . F_UNIT;
 		}
 	],
 	"vat_percent" => [
@@ -346,7 +346,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 		<tbody>
 			<tr>
 				<td>Total (Excluding VAT)</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()) ?><?= F_UNIT ?></td>
+				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotalExcludingDiscount()) ?><?= F_UNIT ?></td>
 				<td>الإجمالي (باستثناء ضريبة القيمة المضافة)&rlm;</td>
 			</tr>
 			<tr>

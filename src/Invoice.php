@@ -10,6 +10,7 @@ use Malik12tree\ZATCA\Utils\Rendering\Template;
 
 use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
+use function Malik12tree\ZATCA\Utils\getLineItemSubtotalExcludingDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 
 class Invoice
@@ -143,6 +144,14 @@ class Invoice
 			$totalSubtotal += getLineItemSubtotal($lineItem);
 		}
 		return $totalSubtotal;
+	}
+	public function computeTotalSubtotalExcludingDiscount()
+	{
+		$totalSubtotalExcludingDiscount = 0;
+		foreach ($this->lineItems as $lineItem) {
+			$totalSubtotalExcludingDiscount += getLineItemSubtotalExcludingDiscount($lineItem);
+		}
+		return $totalSubtotalExcludingDiscount;
 	}
 	public function computeTotal()
 	{
