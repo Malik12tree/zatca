@@ -264,7 +264,7 @@ class EGS
                         ];
                     }
 
-                    $invoice = new Invoice($data);
+                    $invoice = $this->invoice($data);
 
                     $signedInvoice = $this->signInvoice($invoice);
                     $this->checkInvoiceCompliance($signedInvoice);
@@ -279,6 +279,11 @@ class EGS
 
             throw $e;
         }
+    }
+
+    public function invoice($data)
+    {
+        return new Invoice($this->unit, $data);
     }
 
     public function getUUID()

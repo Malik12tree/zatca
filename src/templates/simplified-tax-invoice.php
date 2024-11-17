@@ -24,7 +24,7 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
     </ext:UBLExtensions>
     <cbc:ProfileID>reporting:1.0</cbc:ProfileID>
     <cbc:ID><?= $INVOICE_SERIAL_NUMBER ?></cbc:ID>
-    <cbc:UUID><?= $EGS_INFO["uuid"] ?></cbc:UUID>
+    <cbc:UUID><?= $EGS["uuid"] ?></cbc:UUID>
     <cbc:IssueDate><?= $ISSUE_DATE ?></cbc:IssueDate>
     <cbc:IssueTime><?= $ISSUE_TIME ?></cbc:IssueTime>
     <cbc:InvoiceTypeCode name="<?= $INVOICE_CODE ?>"><?= $INVOICE_TYPE ?></cbc:InvoiceTypeCode>
@@ -60,39 +60,39 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
     <cac:AccountingSupplierParty>
         <cac:Party>
             <cac:PartyIdentification>
-                <cbc:ID schemeID="CRN"><?= $EGS_INFO["crn_number"] ?></cbc:ID>
+                <cbc:ID schemeID="CRN"><?= $EGS["crn_number"] ?></cbc:ID>
             </cac:PartyIdentification>
             <cac:PostalAddress>
-<?php if (isset($EGS_INFO["location"]["street"])): ?>
-                <cbc:StreetName><?= $EGS_INFO["location"]["street"] ?></cbc:StreetName>
+<?php if (isset($EGS["location"]["street"])): ?>
+                <cbc:StreetName><?= $EGS["location"]["street"] ?></cbc:StreetName>
 <?php endif ?>
-<?php if (isset($EGS_INFO["location"]["building"])): ?>
-                <cbc:BuildingNumber><?= $EGS_INFO["location"]["building"] ?></cbc:BuildingNumber>
+<?php if (isset($EGS["location"]["building"])): ?>
+                <cbc:BuildingNumber><?= $EGS["location"]["building"] ?></cbc:BuildingNumber>
 <?php endif ?>
-<?php if (isset($EGS_INFO["location"]["plot_identification"])): ?>
-                <cbc:PlotIdentification><?= $EGS_INFO["location"]["plot_identification"] ?></cbc:PlotIdentification>
+<?php if (isset($EGS["location"]["plot_identification"])): ?>
+                <cbc:PlotIdentification><?= $EGS["location"]["plot_identification"] ?></cbc:PlotIdentification>
 <?php endif ?>
-<?php if (isset($EGS_INFO["location"]["city_subdivision"])): ?>
-                <cbc:CitySubdivisionName><?= $EGS_INFO["location"]["city_subdivision"] ?></cbc:CitySubdivisionName>
+<?php if (isset($EGS["location"]["city_subdivision"])): ?>
+                <cbc:CitySubdivisionName><?= $EGS["location"]["city_subdivision"] ?></cbc:CitySubdivisionName>
 <?php endif ?>
-<?php if (isset($EGS_INFO["location"]["city"])): ?>
-                <cbc:CityName><?= $EGS_INFO["location"]["city"] ?></cbc:CityName>
+<?php if (isset($EGS["location"]["city"])): ?>
+                <cbc:CityName><?= $EGS["location"]["city"] ?></cbc:CityName>
 <?php endif ?>
-<?php if (isset($EGS_INFO["location"]["postal_zone"])): ?>
-                <cbc:PostalZone><?= $EGS_INFO["location"]["postal_zone"] ?></cbc:PostalZone>
+<?php if (isset($EGS["location"]["postal_zone"])): ?>
+                <cbc:PostalZone><?= $EGS["location"]["postal_zone"] ?></cbc:PostalZone>
 <?php endif ?>
                 <cac:Country>
                     <cbc:IdentificationCode>SA</cbc:IdentificationCode>
                 </cac:Country>
             </cac:PostalAddress>
             <cac:PartyTaxScheme>
-                <cbc:CompanyID><?= $EGS_INFO["vat_number"] ?></cbc:CompanyID>
+                <cbc:CompanyID><?= $EGS["vat_number"] ?></cbc:CompanyID>
                 <cac:TaxScheme>
                     <cbc:ID>VAT</cbc:ID>
                 </cac:TaxScheme>
             </cac:PartyTaxScheme>
             <cac:PartyLegalEntity>
-                <cbc:RegistrationName><?= $EGS_INFO["vat_name"] ?></cbc:RegistrationName>
+                <cbc:RegistrationName><?= $EGS["vat_name"] ?></cbc:RegistrationName>
             </cac:PartyLegalEntity>
         </cac:Party>
     </cac:AccountingSupplierParty>

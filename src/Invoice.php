@@ -34,15 +34,15 @@ class Invoice
 
     private $cachedHash;
 
-    public function __construct($data)
+    public function __construct($unit, $data)
     {
-        $this->egsUnit = $data['egs_info'];
+        $this->egsUnit = $unit;
         $this->issueDate = $data['issue_date'];
         $this->issueTime = $data['issue_time'];
         $this->invoiceType = $data['invoice_type'];
         $this->invoiceSerialNumber = $data['invoice_serial_number'];
-        $this->vatNumber = $data['egs_info']['vat_number'];
-        $this->vatName = $data['egs_info']['vat_name'];
+        $this->vatNumber = $unit['vat_number'];
+        $this->vatName = $unit['vat_name'];
         $this->deliveryDate = $data['actual_delivery_date'] ?? null;
         $this->customerInfo = $data['customer_info'] ?? [];
         $this->lineItems = $data['line_items'] ?? [];
@@ -53,7 +53,7 @@ class Invoice
         )) =
             Template::render('simplified-tax-invoice', [
                 'invoice' => $this,
-                'EGS_INFO' => $data['egs_info'],
+                'EGS' => $unit,
                 'CUSTOMER_INFO' => $this->customerInfo,
                 'LINE_ITEMS' => $data['line_items'] ?? [],
                 'INVOICE_SERIAL_NUMBER' => $data['invoice_serial_number'],
