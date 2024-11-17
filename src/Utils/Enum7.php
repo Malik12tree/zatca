@@ -72,7 +72,7 @@ abstract class Enum7
 
     public static function fromString($name)
     {
-        if (self::isValidName($name, $strict = true)) {
+        if (self::isValidName($name, true)) {
             $constants = self::cases();
 
             return $constants[$name];

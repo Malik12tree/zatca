@@ -123,8 +123,6 @@ class Invoice
     public function getCustomerInfo($key = null)
     {
         return $key ? ($this->customerInfo[$key] ?? null) : $this->customerInfo;
-
-        return $this->customerInfo;
     }
 
     public function getFormattedIssueDate()
@@ -270,16 +268,19 @@ class Invoice
         $document = new \DOMDocument();
         $document->loadXML($this->invoiceXML);
 
-        if ($element = $document->getElementsByTagName('UBLExtensions')->item(0)) {
+        $element = $document->getElementsByTagName('UBLExtensions')->item(0);
+        if ($element) {
             $element->remove();
         }
 
-        if ($element = $document->getElementsByTagName('Signature')->item(0)) {
+        $element = $document->getElementsByTagName('Signature')->item(0);
+        if ($element) {
             $element->remove();
         }
 
         // Remove QR Code Tag
-        if ($element = $document->getElementsByTagName('AdditionalDocumentReference')->item(2)) {
+        $element = $document->getElementsByTagName('AdditionalDocumentReference')->item(2);
+        if ($element) {
             $element->remove();
         }
 
