@@ -2,6 +2,9 @@
 
 namespace Malik12tree\ZATCA;
 
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceCode;
+use Malik12tree\ZATCA\Invoice\Enums\InvoicePaymentMethod;
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceType;
 use Malik12tree\ZATCA\Invoice\SignedInvoice;
 use Malik12tree\ZATCA\Utils\API;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
