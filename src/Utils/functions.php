@@ -2,7 +2,7 @@
 
 namespace Malik12tree\ZATCA\Utils;
 
-use Malik12tree\ZATCA\InvoiceVATCategory;
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceVATCategory;
 
 if (!function_exists('zatcaNumberFormat')) {
     function zatcaNumberFormat($number)

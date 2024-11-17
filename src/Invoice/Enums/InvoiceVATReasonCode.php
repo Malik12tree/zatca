@@ -1,6 +1,6 @@
 <?php
 
-namespace Malik12tree\ZATCA\InvoiceVATCategory;
+namespace Malik12tree\ZATCA\Invoice\Enums;
 
 use Malik12tree\ZATCA\Utils\Enum7;
 

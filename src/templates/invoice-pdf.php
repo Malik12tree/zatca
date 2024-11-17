@@ -1,6 +1,5 @@
 <?php
 
-use Malik12tree\ZATCA\InvoiceType;
 use Malik12tree\ZATCA\Invoice;
 
 use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
