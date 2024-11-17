@@ -160,4 +160,23 @@ class API
 			'E_REPORT_INVOICE'
 		);
 	}
+	public function clearanceInvoice($certificate, $secret, $signedInvoice, $invoiceHash, $egsUuid)
+	{
+		return $this->post(
+			'/invoices/clearance/single',
+			[
+				'Accept-Version: ' . API::VERSION,
+				"Accept-Language: en",
+				'Content-Type: application/json',
+				"Clearance-Status: 1",
+				...$this->getAuthHeaders($certificate, $secret)
+			],
+			[
+				'invoiceHash' => $invoiceHash,
+				'uuid' => $egsUuid,
+				'invoice' => base64_encode($signedInvoice),
+			],
+			'E_CLEARANCE_INVOICE'
+		);
+	}
 }
