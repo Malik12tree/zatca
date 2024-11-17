@@ -2,7 +2,7 @@
 
 use Malik12tree\ZATCA\Invoice;
 
-use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
+use function Malik12tree\ZATCA\Utils\getLineItemUnitDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 use function Malik12tree\ZATCA\Utils\getLineItemTotal;
@@ -40,7 +40,7 @@ $columns = [
 		"@map" => static function ($value, $row) {
 			global $totalDiscount;
 
-			$discount = getLineItemDiscounts($row);
+			$discount = getLineItemUnitDiscount($row);
 			$totalDiscount += $discount;
 
 			return zatcaNumberFormat($discount) . F_UNIT;
@@ -345,7 +345,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 		<tbody>
 			<tr>
 				<td>Total (Excluding VAT)</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotalExcludingDiscount()) ?><?= F_UNIT ?></td>
+				<td><?= zatcaNumberFormat($invoice->computeTotalPrice()) ?><?= F_UNIT ?></td>
 				<td>الإجمالي (باستثناء ضريبة القيمة المضافة)&rlm;</td>
 			</tr>
 			<tr>

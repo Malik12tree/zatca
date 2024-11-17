@@ -11,8 +11,15 @@ if (!function_exists('zatcaNumberFormat')) {
     }
 }
 
-if (!function_exists('getLineItemDiscounts')) {
-    function getLineItemDiscounts($item)
+if (!function_exists('getLineItemUnitPrice')) {
+    function getLineItemUnitPrice($item)
+    {
+        return $item['tax_exclusive_price'];
+    }
+}
+
+if (!function_exists('getLineItemUnitDiscount')) {
+    function getLineItemUnitDiscount($item)
     {
         if (!isset($item['discounts'])) {
             return 0;
@@ -26,24 +33,37 @@ if (!function_exists('getLineItemDiscounts')) {
         }, 0);
     }
 }
-if (!function_exists('getLineItemSubtotal')) {
-    function getLineItemSubtotal($item)
+
+if (!function_exists('getLineItemUnitSubtotal')) {
+    function getLineItemUnitSubtotal($item)
     {
-        return $item['quantity'] * ($item['tax_exclusive_price'] - getLineItemDiscounts($item));
+        return getLineItemUnitPrice($item) - getLineItemUnitDiscount($item);
     }
 }
 
-if (!function_exists('getLineItemSubtotalExcludingDiscount')) {
-    function getLineItemSubtotalExcludingDiscount($item)
+if (!function_exists('getLineItemPrice')) {
+    function getLineItemPrice($item)
     {
-        return $item['quantity'] * $item['tax_exclusive_price'];
+        return $item['quantity'] * getLineItemUnitPrice($item);
+    }
+}
+
+if (!function_exists('getLineItemDiscount')) {
+    function getLineItemDiscount($item)
+    {
+        return $item['quantity'] * getLineItemUnitDiscount($item);
+    }
+}
+if (!function_exists('getLineItemSubtotal')) {
+    function getLineItemSubtotal($item)
+    {
+        return $item['quantity'] * getLineItemUnitSubtotal($item);
     }
 }
 
 if (!function_exists('getLineItemTaxes')) {
     function getLineItemTaxes($item)
     {
-        // BR-KSA-DEC-02
         return getLineItemSubtotal($item) * $item['vat_percent'];
     }
 }

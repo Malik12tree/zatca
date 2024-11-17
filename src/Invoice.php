@@ -7,9 +7,9 @@ use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 use Malik12tree\ZATCA\Utils\Encoding\TLV;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
 
-use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
+use function Malik12tree\ZATCA\Utils\getLineItemDiscount;
+use function Malik12tree\ZATCA\Utils\getLineItemPrice;
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
-use function Malik12tree\ZATCA\Utils\getLineItemSubtotalExcludingDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 
 class Invoice
@@ -132,42 +132,42 @@ class Invoice
 
     public function computeTotalTaxes()
     {
-        $totalTaxes = 0;
+        $total = 0;
         foreach ($this->lineItems as $lineItem) {
-            $totalTaxes += getLineItemTaxes($lineItem);
+            $total += getLineItemTaxes($lineItem);
         }
 
-        return $totalTaxes;
+        return $total;
     }
 
     public function computeTotalDiscounts()
     {
-        $totalDiscounts = 0;
+        $total = 0;
         foreach ($this->lineItems as $lineItem) {
-            $totalDiscounts += getLineItemDiscounts($lineItem);
+            $total += getLineItemDiscount($lineItem);
         }
 
-        return $totalDiscounts;
+        return $total;
     }
 
     public function computeTotalSubtotal()
     {
-        $totalSubtotal = 0;
+        $total = 0;
         foreach ($this->lineItems as $lineItem) {
-            $totalSubtotal += getLineItemSubtotal($lineItem);
+            $total += getLineItemSubtotal($lineItem);
         }
 
-        return $totalSubtotal;
+        return $total;
     }
 
-    public function computeTotalSubtotalExcludingDiscount()
+    public function computeTotalPrice()
     {
-        $totalSubtotalExcludingDiscount = 0;
+        $total = 0;
         foreach ($this->lineItems as $lineItem) {
-            $totalSubtotalExcludingDiscount += getLineItemSubtotalExcludingDiscount($lineItem);
+            $total += getLineItemPrice($lineItem);
         }
 
-        return $totalSubtotalExcludingDiscount;
+        return $total;
     }
 
     public function computeTotal()

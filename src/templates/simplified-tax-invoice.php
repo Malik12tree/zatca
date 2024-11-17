@@ -2,9 +2,11 @@
 
 use Malik12tree\ZATCA\Utils\Rendering\Template;
 
-use function Malik12tree\ZATCA\Utils\getLineItemDiscounts;
+use function Malik12tree\ZATCA\Utils\getLineItemUnitDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
+use function Malik12tree\ZATCA\Utils\getLineItemUnitPrice;
+use function Malik12tree\ZATCA\Utils\getLineItemUnitSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemVATCategory;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
 
@@ -191,13 +193,13 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
             </cac:ClassifiedTaxCategory>
         </cac:Item>
         <cac:Price>
-            <cbc:PriceAmount currencyID="SAR"><?= zatcaNumberFormat($lineItem['tax_exclusive_price'] - getLineItemDiscounts($lineItem)) ?></cbc:PriceAmount>
+            <cbc:PriceAmount currencyID="SAR"><?= zatcaNumberFormat(getLineItemUnitSubtotal($lineItem)) ?></cbc:PriceAmount>
 <?php foreach ($lineItem['discounts'] ?? [] as $discount): ?>
                 <cac:AllowanceCharge>
                     <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
                     <cbc:AllowanceChargeReason><?= $discount['reason'] ?></cbc:AllowanceChargeReason>
                     <cbc:Amount currencyID="SAR"><?= zatcaNumberFormat($discount['amount']) ?></cbc:Amount>
-                    <cbc:BaseAmount currencyID="SAR"><?= zatcaNumberFormat($lineItem['tax_exclusive_price']) ?></cbc:BaseAmount>
+                    <cbc:BaseAmount currencyID="SAR"><?= zatcaNumberFormat(getLineItemUnitPrice($lineItem)) ?></cbc:BaseAmount>
                 </cac:AllowanceCharge>
 <?php endforeach; ?>
         </cac:Price>
