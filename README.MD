@@ -3,8 +3,15 @@
   <br/>
   <!-- ZATCA Phase 2 -->
   <img src="https://img.shields.io/badge/💸_ZATCA-Phase_2-00b694" />
+  <!-- E-Invoicing -->
+  <img src="https://img.shields.io/badge/📃_ZATCA-E--Invoicing-fc5f08">
+  <!-- Encrypted -->
+  <img src="https://img.shields.io/badge/🔐_ZATCA-Encrypted-f75394">
+  <br/>
+  <!-- XML Complaint -->
+  <img src="https://img.shields.io/badge/📝_XML-Complaint-ff5555">
   <!-- PDF/A-3 Complaint -->
-  <img src="https://img.shields.io/badge/📄_PDF%2FA--3-Complaint-ff5555">
+  <img src="https://img.shields.io/badge/📕_PDF%2FA--3-Complaint-ff5555">
   <!-- QR Code -->
   <img src="https://img.shields.io/badge/🔋_QR_Codes-Included-5793ff">
   <br/>
