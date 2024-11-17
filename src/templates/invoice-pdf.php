@@ -15,8 +15,105 @@ $tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%" style="ove
 const UNIT = 'SAR';
 const F_UNIT = " " . UNIT;
 
-$totalDiscount = 0;
-$columns = [
+
+$invoiceBodyTable = [
+	'head' => [
+		[
+			'en' => 'Seller',
+			'ar' => 'التاجر',
+		],
+		[
+			'en' => 'Buyer',
+			'ar' => 'المشتري',
+		],
+	],
+	'rows' => [
+		[
+			'en' => 'Name',
+			'ar' => 'الاسم',
+
+			'values' => [
+				$invoice->getVATName(),
+				$invoice->getCustomerInfo('buyer_name'),
+			],
+		],
+		[
+			'en' => 'VAT Number',
+			'ar' => 'رقم الضريبة',
+
+			'values' => [
+				$invoice->getVATNumber(),
+				$invoice->getCustomerInfo('vat_number'),
+			],
+		],
+		[
+			'en' => 'Building No.',
+			'ar' => 'رقم المبنى',
+
+			'values' => [
+				$invoice->getEGS()['location']['building'] ?? '',
+				$invoice->getCustomerInfo('building'),
+			],
+		],
+		[
+			'en' => 'Street Name',
+			'ar' => 'اسم الشارع',
+
+			'values' => [
+				$invoice->getEGS()['location']['street'] ?? '',
+				$invoice->getCustomerInfo('street'),
+			],
+		],
+		[
+			'en' => 'District',
+			'ar' => 'المنطقة',
+
+			'values' => [
+				$invoice->getEGS()['location']['city_subdivision'] ?? '',
+				$invoice->getCustomerInfo('city_subdivision'),
+			],
+		],
+		[
+			'en' => 'City',
+			'ar' => 'المدينة',
+
+			'values' => [
+				$invoice->getEGS()['location']['city'] ?? '',
+				$invoice->getCustomerInfo('city'),
+			],
+		],
+		[
+			'en' => 'Country',
+			'ar' => 'البلد',
+
+			'values' => [
+				'Kingdom of Saudi Arabia',
+				'Kingdom of Saudi Arabia',
+			],
+		],
+		[
+			'en' => 'Postal Code',
+			'ar' => 'الرمز البريدي',
+
+			'values' => [
+				$invoice->getEGS()['location']['postal_zone'] ?? '',
+				$invoice->getCustomerInfo('postal_zone'),
+			],
+		],
+		[
+			'en' => 'Plot Number',
+			'ar' => 'رقم الأرض',
+
+			'values' => [
+				$invoice->getEGS()['location']['plot_identification'] ?? '',
+				$invoice->getCustomerInfo('plot_identification'),
+			],
+		],
+	],
+];
+
+
+$lineItemsTable = [
 	"name" => [
 		"en" => "Goods and Services",
 		"ar" => "السلع والخدمات"
@@ -38,12 +135,7 @@ $columns = [
 		"ar" => "خصومات",
 
 		"@map" => static function ($value, $row) {
-			global $totalDiscount;
-
-			$discount = getLineItemUnitDiscount($row);
-			$totalDiscount += $discount;
-
-			return zatcaNumberFormat($discount) . F_UNIT;
+			return zatcaNumberFormat(getLineItemUnitDiscount($row)) . F_UNIT;
 		}
 	],
 	"taxable_amount" => [
@@ -195,100 +287,28 @@ function symmetricTableStyles($selector, $repeat = 1)
 	<table class="invoice_body" <?= $tableAttrs ?>>
 		<thead>
 			<tr>
-				<th colspan="3">
-					<span>Seller</span>
-					-
-					<span>تاجر</span>
-				</th>
-
-				<th colspan="3">
-					<span>Buyer</span>
-					-
-					<span>مشتر</span>
-				</th>
+				<?php foreach ($invoiceBodyTable['head'] as $columnTitle): ?>
+					<th colspan="3">
+						<span><?= $columnTitle['en'] ?></span>
+						-
+						<span><?= $columnTitle['ar'] ?></span>
+					</th>
+				<?php endforeach; ?>
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>Name</td>
-				<td><?= $invoice->getVATName(); ?></td>
-				<td>اسم</td>
-				<td>Name</td>
-				<td><?= $invoice->getCustomerInfo("buyer_name") ?? ''; ?></td>
-				<td>اسم</td>
-			</tr>
-			<tr>
-				<td>Building No.</td>
-				<td><?= $invoice->getEGS()["location"]["building"]; ?></td>
-				<td>No. بني</td>
-				<td>Building No.</td>
-				<td><?= $invoice->getCustomerInfo("building") ?? ''; ?></td>
-				<td>No. بني</td>
-			</tr>
-			<tr>
-				<td>Street Name</td>
-				<td><?= $invoice->getEGS()["location"]["street"]; ?></td>
-				<td>اسم الشارع</td>
-				<td>Street Name</td>
-				<td><?= $invoice->getCustomerInfo("street") ?? ''; ?></td>
-				<td>اسم الشارع</td>
-			</tr>
-			<tr>
-				<td>District</td>
-				<td><?= $invoice->getEGS()["location"]["city_subdivision"]; ?></td>
-				<td>المنطقة</td>
-				<td>District</td>
-				<td><?= $invoice->getCustomerInfo("city_subdivision") ?? ''; ?></td>
-				<td>المنطقة</td>
-			</tr>
-			<tr>
-				<td>City</td>
-				<td><?= $invoice->getEGS()["location"]["city"]; ?></td>
-				<td>المدينة</td>
-				<td>City</td>
-				<td><?= $invoice->getCustomerInfo("city") ?? ''; ?></td>
-				<td>المدينة</td>
-			</tr>
-			<tr>
-				<td>Country</td>
-				<td>Kingdom of Saudi Arabia</td>
-				<td>البلد</td>
-				<td>Country</td>
-				<td>Kingdom of Saudi Arabia</td>
-				<td>البلد</td>
-			</tr>
-			<tr>
-				<td>Postal Code</td>
-				<td><?= htmlentities($invoice->getEGS()["location"]["postal_zone"]); ?></td>
-				<td>الرمز البريدي</td>
-				<td>Postal Code</td>
-				<td><?= htmlentities($invoice->getCustomerInfo("postal_zone") ?? ''); ?></td>
-				<td>الرمز البريدي</td>
-			</tr>
-			<tr>
-				<td>Plot Number</td>
-				<td><?= htmlentities($invoice->getEGS()["location"]["plot_identification"] ?? ''); ?></td>
-				<td>رقم الأرض</td>
-				<td>Plot Number</td>
-				<td><?= htmlentities($invoice->getCustomerInfo("plot_identification") ?? '') ?></td>
-				<td>رقم الأرض</td>
-			</tr>
-			<tr>
-				<td>VAT Number</td>
-				<td><?= htmlentities($invoice->getVATNumber()) ?></td>
-				<td>رقم الضريبة</td>
-				<td>VAT Number</td>
-				<td><?= htmlentities($invoice->getCustomerInfo("vat_number") ?? '') ?></td>
-				<td>رقم الضريبة</td>
-			</tr>
-			<tr>
-				<td>Other Seller ID</td>
-				<td>TODO</td>
-				<td>رقم المبيعات الأخرى</td>
-				<td>Other Seller ID</td>
-				<td>TODO</td>
-				<td>رقم المبيعات الأخرى</td>
-			</tr>
+			<?php foreach ($invoiceBodyTable['rows'] as $row): ?>
+				<?php $atLeastOneTruthy = array_search(true, $row['values'], false) !== false ?> 
+				<?php if ($atLeastOneTruthy) { ?>
+					<tr>
+						<?php foreach ($row['values'] as $value): ?>
+							<td><?= $row['en'] ?></td>
+							<td><?= $value ?></td>
+							<td><?= $row['ar'] ?></td>
+						<?php endforeach; ?>
+					</tr>
+				<?php } ?>
+			<?php endforeach ?>
 		</tbody>
 	</table>
 
@@ -303,7 +323,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 				<th colspan="4" style="text-align: right;">البنود</th>
 			</tr>
 			<tr>
-				<?php foreach ($columns as $columnName => list("en" => $columnTitleEn, "ar" => $columnTitleAr)): ?>
+				<?php foreach ($lineItemsTable as $columnName => list("en" => $columnTitleEn, "ar" => $columnTitleAr)): ?>
 					<th>
 						<span><?= $columnTitleEn ?></span>
 						<br>
@@ -315,7 +335,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 		<tbody>
 			<?php foreach ($invoice->getLineItems() as $lineItem): ?>
 				<tr>
-					<?php foreach ($columns as $columnName => $column): ?>
+					<?php foreach ($lineItemsTable as $columnName => $column): ?>
 						<?php if (isset($column["@map"])): ?>
 							<td><?= $column["@map"]($lineItem[$columnName] ?? null, $lineItem) ?></td>
 						<?php else: ?>
