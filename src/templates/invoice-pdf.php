@@ -251,10 +251,10 @@ function symmetricTableStyles($selector, $repeat = 1)
 			</tr>
 			<tr>
 				<td>Country</td>
-				<td><?= htmlentities($invoice->getEGS()["location"]["country_sub_entity"] ?? '') ?></td>
+				<td>Kingdom of Saudi Arabia</td>
 				<td>البلد</td>
 				<td>Country</td>
-				<td><?= htmlentities($invoice->getCustomerInfo("country_sub_entity") ?? '') ?></td>
+				<td>Kingdom of Saudi Arabia</td>
 				<td>البلد</td>
 			</tr>
 			<tr>
@@ -266,12 +266,12 @@ function symmetricTableStyles($selector, $repeat = 1)
 				<td>الرمز البريدي</td>
 			</tr>
 			<tr>
-				<td>Additional No.</td>
-				<td><?= htmlentities($invoice->getEGS()["location"]["additional_no"] ?? ''); ?></td>
-				<td>رقم اضافي</td>
-				<td>Additional No.</td>
-				<td><?= htmlentities($invoice->getCustomerInfo("additional_no") ?? ''); ?></td>
-				<td>رقم اضافي</td>
+				<td>Plot Number</td>
+				<td><?= htmlentities($invoice->getEGS()["location"]["plot_identification"] ?? ''); ?></td>
+				<td>رقم الأرض</td>
+				<td>Plot Number</td>
+				<td><?= htmlentities($invoice->getCustomerInfo("plot_identification") ?? '') ?></td>
+				<td>رقم الأرض</td>
 			</tr>
 			<tr>
 				<td>VAT Number</td>

@@ -106,9 +106,6 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
 <?php if (isset($CUSTOMER_INFO["street"])): ?>
                 <cbc:StreetName><?= $CUSTOMER_INFO["street"] ?></cbc:StreetName>
 <?php endif ?>
-<?php if (isset($CUSTOMER_INFO["additional_street"])): ?>
-                <cbc:AdditionalStreetName><?= $CUSTOMER_INFO["additional_street"] ?></cbc:AdditionalStreetName>
-<?php endif ?>
 <?php if (isset($CUSTOMER_INFO["building"])): ?>
                 <cbc:BuildingNumber><?= $CUSTOMER_INFO["building"] ?></cbc:BuildingNumber>
 <?php endif ?>
@@ -123,9 +120,6 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
 <?php endif ?>
 <?php if (isset($CUSTOMER_INFO["postal_zone"])): ?>
                 <cbc:PostalZone><?= $CUSTOMER_INFO["postal_zone"] ?></cbc:PostalZone>
-<?php endif ?>
-<?php if (isset($CUSTOMER_INFO["country_sub_entity"])): ?>
-                <cbc:CountrySubentity><?= $CUSTOMER_INFO["country_sub_entity"] ?></cbc:CountrySubentity>
 <?php endif ?>
                 <cac:Country>
                     <cbc:IdentificationCode>SA</cbc:IdentificationCode>

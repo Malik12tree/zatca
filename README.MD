@@ -192,7 +192,6 @@ $invoice = $egs->invoice([
         'street' => 'Abaseya Tunnel',
         'city_subdivision' => '',
         'city' => 'Dammam',
-        'country_sub_entity' => 'Eastern Province',
         'plot_identification' => '0000',
         'postal_zone' => '00000',
     ],
