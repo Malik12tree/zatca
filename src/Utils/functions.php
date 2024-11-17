@@ -14,7 +14,7 @@ if (!function_exists('zatcaNumberFormat')) {
 if (!function_exists('getLineItemUnitPrice')) {
     function getLineItemUnitPrice($item)
     {
-        return $item['tax_exclusive_price'];
+        return $item['unit_price'];
     }
 }
 

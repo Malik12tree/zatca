@@ -21,7 +21,7 @@ $columns = [
 		"en" => "Goods and Services",
 		"ar" => "السلع والخدمات"
 	],
-	"tax_exclusive_price" => [/*  */
+	"unit_price" => [/*  */
 		"en" => "Unit price",
 		"ar" => "سعر الوحدة",
  

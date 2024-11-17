@@ -201,7 +201,7 @@ $invoice = $egs->invoice([
             'id' => "sugarcane_juicer_metal",
             'name' => 'Metal Sugarcane Juicer',
             'quantity' => 1.0,
-            'tax_exclusive_price' => 525.0,
+            'unit_price' => 525.0,
             'vat_percent' => 0.15,
             'discounts' => [
                 [

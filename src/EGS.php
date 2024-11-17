@@ -251,7 +251,7 @@ class EGS
                                 'id' => 'dummy',
                                 'name' => 'Dummy Item',
                                 'quantity' => 1,
-                                'tax_exclusive_price' => 10,
+                                'unit_price' => 10,
                                 'vat_percent' => 0.15,
                             ],
                         ],
