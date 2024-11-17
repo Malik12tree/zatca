@@ -154,6 +154,10 @@ class EGS
 		);
 	}
 
+	public function getExpiryDate()
+	{
+		return Crypto::getCertificateInfo($this->unit['production_certificate'])['expiryDate'];
+	}
 
 	public function setDatabase($database)
 	{

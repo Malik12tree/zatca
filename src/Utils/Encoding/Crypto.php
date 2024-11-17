@@ -79,6 +79,8 @@ class Crypto
 			"serialNumber" => $serialNumber,
 			"publicKey" => $publicKey,
 			"signature" => $signature,
+			"birthDate" => $x509['validFrom_time_t'],
+			"expiryDate" => $x509['validTo_time_t'],
 		];
 	}
 
