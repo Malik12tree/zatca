@@ -59,6 +59,40 @@ use Malik12tree\ZATCA;
 use Malik12tree\ZATCA\EGS;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 
+// Your must set the EGS environment or else initiating an EGS will throw an exception.
+// Possible values are sandbox, simulation and production.
+// - sandbox:
+//   - For testing purposes only.
+//   - Validation only.
+//   - No web-based portal.
+//   - Known Fixed OTPs:
+//      - Valid: 123345
+//      - Invalid: 111111
+//      - Expired: 222222
+// - simulation:
+//   - For testing purposes only.
+//   - Connects to the Fatoora portal.
+//   - Generate OTPs.
+//   - Simulates real validation and storing of EGSs and invoices at the simulation database.
+//   - Accessing Portal:
+//      - Head to https://fatoora.zatca.gov.sa
+//      - Login with your credentials.
+//      - Click "Fatoora Simulation Portal".
+// - production:
+//   - For live production use.
+//   - Exercise caution when using this environment.
+//   - Connects to the Fatoora portal.
+//   - Generate OTPs
+//   - Real validation and storing of EGSs and invoices at the production database.
+//   - Accessing Portal:
+//      - Head to https://fatoora.zatca.gov.sa
+//      - Login with your credentials.
+//      - Click "Fatoora Simulation Portal".
+//
+// - simulation: This is for testing purposes containing real validation with a real database storing EGSs and invoices. It does connect to a portal. You can generate OTPs from the Fatoora portal. You can view generate EGSs and invoices at the portal.
+// - production: This is used dangerously in production.
+EGS::setEnv('sandbox');
+
 $egs = new EGS([
     // EGS Serial Number
     // You should generate a unique UUID for each EGS
