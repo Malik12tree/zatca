@@ -6,6 +6,6 @@ use Malik12tree\ZATCA\Utils\Enum7;
 
 class InvoiceCode extends Enum7
 {
-	const TAX = '0100000';
-	const SIMPLE = '0200000';
+    public const TAX = '0100000';
+    public const SIMPLE = '0200000';
 }

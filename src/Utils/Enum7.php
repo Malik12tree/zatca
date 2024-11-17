@@ -1,6 +1,7 @@
 <?php
 
 namespace Malik12tree\ZATCA\Utils;
+
 /*
 **
 * Implements the abstract base for all enum types
@@ -29,59 +30,63 @@ namespace Malik12tree\ZATCA\Utils;
 * DayOfWeek::fromString('Monday') // (int) 1
 * DayOfWeek::toString(DayOfWeek::Tuesday) // (string) "Tuesday"
 * DayOfWeek::toString(5) // (string) "Friday"
-**/
+*/
 
 abstract class Enum7
 {
-	private static $constCacheArray = NULL;
+    private static $constCacheArray;
 
-	public static function cases()
-	{
-		if (self::$constCacheArray == NULL) {
-			self::$constCacheArray = [];
-		}
-		$calledClass = get_called_class();
-		if (!array_key_exists($calledClass, self::$constCacheArray)) {
-			$reflect = new \ReflectionClass($calledClass);
-			self::$constCacheArray[$calledClass] = $reflect->getConstants();
-		}
-		return self::$constCacheArray[$calledClass];
-	}
+    public static function cases()
+    {
+        if (null == self::$constCacheArray) {
+            self::$constCacheArray = [];
+        }
+        $calledClass = get_called_class();
+        if (!array_key_exists($calledClass, self::$constCacheArray)) {
+            $reflect = new \ReflectionClass($calledClass);
+            self::$constCacheArray[$calledClass] = $reflect->getConstants();
+        }
 
-	public static function isValidName($name, $strict = false)
-	{
-		$constants = self::cases();
+        return self::$constCacheArray[$calledClass];
+    }
 
-		if ($strict) {
-			return array_key_exists($name, $constants);
-		}
+    public static function isValidName($name, $strict = false)
+    {
+        $constants = self::cases();
 
-		$keys = array_map('strtolower', array_keys($constants));
-		return in_array(strtolower($name), $keys);
-	}
+        if ($strict) {
+            return array_key_exists($name, $constants);
+        }
 
-	public static function isValidValue($value, $strict = true)
-	{
-		$values = array_values(self::cases());
-		return in_array($value, $values, $strict);
-	}
+        $keys = array_map('strtolower', array_keys($constants));
 
-	public static function fromString($name)
-	{
-		if (self::isValidName($name, $strict = true)) {
-			$constants = self::cases();
-			return $constants[$name];
-		}
+        return in_array(strtolower($name), $keys);
+    }
 
-		return false;
-	}
+    public static function isValidValue($value, $strict = true)
+    {
+        $values = array_values(self::cases());
 
-	public static function toString($value)
-	{
-		if (self::isValidValue($value, true)) {
-			return array_search($value, self::cases());
-		}
+        return in_array($value, $values, $strict);
+    }
 
-		return false;
-	}
+    public static function fromString($name)
+    {
+        if (self::isValidName($name, $strict = true)) {
+            $constants = self::cases();
+
+            return $constants[$name];
+        }
+
+        return false;
+    }
+
+    public static function toString($value)
+    {
+        if (self::isValidValue($value, true)) {
+            return array_search($value, self::cases());
+        }
+
+        return false;
+    }
 }

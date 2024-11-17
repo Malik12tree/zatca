@@ -1,53 +1,50 @@
 <?php
 
-
 namespace Malik12tree\ZATCA\InvoiceVATCategory;
 
 use Malik12tree\ZATCA\Utils\Enum7;
 
 class InvoiceVATReasonCode extends Enum7
 {
+    /** Financial services mentioned in Article 29 of the VAT Regulations */
+    public const E_29 = 'VATEX-SA-29';
 
-	/** Financial services mentioned in Article 29 of the VAT Regulations */
-	const E_29 = "VATEX-SA-29";
+    /** Life insurance services mentioned in Article 29 of the VAT */
+    public const E_29_7 = 'VATEX-SA-29-7';
 
-	/** Life insurance services mentioned in Article 29 of the VAT */
-	const E_29_7 = "VATEX-SA-29-7";
+    /** Real estate transactions mentioned in Article 30 of the VAT */
+    public const E_30 = 'VATEX-SA-30';
 
-	/** Real estate transactions mentioned in Article 30 of the VAT */
-	const E_30 = "VATEX-SA-30";
+    /** Export of goods */
+    public const Z_32 = 'VATEX-SA-32';
 
+    /** Export of services */
+    public const Z_33 = 'VATEX-SA-33';
 
-	/** Export of goods */
-	const Z_32 = "VATEX-SA-32";
+    /** The international transport of Goods  */
+    public const Z_34_1 = 'VATEX-SA-34-1';
 
-	/** Export of services */
-	const Z_33 = "VATEX-SA-33";
+    /** The international transport of passengers */
+    public const Z_34_2 = 'VATEX-SA-34-2';
 
-	/** The international transport of Goods  */
-	const Z_34_1 = "VATEX-SA-34-1";
+    /** Services directly connected and incidental to a Supply of international passenger transport */
+    public const Z_34_3 = 'VATEX-SA-34-3';
 
-	/** The international transport of passengers */
-	const Z_34_2 = "VATEX-SA-34-2";
+    /** Supply of a qualifying means of transport */
+    public const Z_34_4 = 'VATEX-SA-34-4';
 
-	/** Services directly connected and incidental to a Supply of international passenger transport */
-	const Z_34_3 = "VATEX-SA-34-3";
+    /** Any services relating to Goods or passenger transportation, as defined in article twenty five of these Regulations */
+    public const Z_34_5 = 'VATEX-SA-34-5';
 
-	/** Supply of a qualifying means of transport */
-	const Z_34_4 = "VATEX-SA-34-4";
+    /** Medicines and medical equipment */
+    public const Z_35 = 'VATEX-SA-35';
 
-	/** Any services relating to Goods or passenger transportation, as defined in article twenty five of these Regulations */
-	const Z_34_5 = "VATEX-SA-34-5";
+    /** Qualifying metals */
+    public const Z_36 = 'VATEX-SA-36';
 
-	/** Medicines and medical equipment */
-	const Z_35 = "VATEX-SA-35";
+    /** Private education to citizen */
+    public const Z_EDU = 'VATEX-SA-EDU';
 
-	/** Qualifying metals */
-	const Z_36 = "VATEX-SA-36";
-
-	/** Private education to citizen */
-	const Z_EDU = "VATEX-SA-EDU";
-
-	/** Private healthcare to citizen */
-	const Z_HEA = "VATEX-SA-HEA";
+    /** Private healthcare to citizen */
+    public const Z_HEA = 'VATEX-SA-HEA';
 }

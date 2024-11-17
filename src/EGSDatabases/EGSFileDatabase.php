@@ -2,48 +2,55 @@
 
 namespace Malik12tree\ZATCA\EGSDatabases;
 
-use Exception;
 use Malik12tree\ZATCA\EGS;
 use Malik12tree\ZATCA\EGSDatabase;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 
 class EGSFileDatabase extends EGSDatabase
 {
-	private $path;
-	public function __construct($path)
-	{
-		$this->path = $path;
-	}
+    private $path;
 
-	public function getEGSPath($uuid)
-	{
-		if (!Crypto::isUUID($uuid)) throw new Exception("EGS UUID is not valid.");
+    public function __construct($path)
+    {
+        $this->path = $path;
+    }
 
-		return $this->path . "/{$uuid}.json";
-	}
+    public function getEGSPath($uuid)
+    {
+        if (!Crypto::isUUID($uuid)) {
+            throw new \Exception('EGS UUID is not valid.');
+        }
 
-	protected function _load($uuid)
-	{
-		$path = $this->getEGSPath($uuid);
-		if (!file_exists($path)) return null;
+        return $this->path."/{$uuid}.json";
+    }
 
-		$json = file_get_contents($path);
-		if (!$json) return null;
+    public function save($egs)
+    {
+        $json = json_encode($egs->toJSON());
+        $uuid = $egs->getUUID();
 
-		return new EGS(json_decode($json, true));
-	}
-	public function save($egs)
-	{
-		$json = json_encode($egs->toJSON());
-		$uuid = $egs->getUUID();
+        if (!file_exists($this->path)) {
+            mkdir($this->path, 0777, true);
+        } elseif (!is_dir($this->path)) {
+            throw new \Exception("EGS path {$this->path} is not a directory.");
+        }
 
-		if (!file_exists($this->path)) {
-			mkdir($this->path, 0777, true);
-		} else if (!is_dir($this->path)) {
-			throw new Exception("EGS path {$this->path} is not a directory.");
-		}
+        $path = $this->getEGSPath($uuid);
+        file_put_contents($path, $json);
+    }
 
-		$path = $this->getEGSPath($uuid);
-		file_put_contents($path, $json);
-	}
+    protected function _load($uuid)
+    {
+        $path = $this->getEGSPath($uuid);
+        if (!file_exists($path)) {
+            return null;
+        }
+
+        $json = file_get_contents($path);
+        if (!$json) {
+            return null;
+        }
+
+        return new EGS(json_decode($json, true));
+    }
 }
