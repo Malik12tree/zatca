@@ -66,7 +66,7 @@ class Crypto
 		$res = openssl_get_publickey($certificate);
 		$cert = openssl_pkey_get_details($res);
 
-		$issuer = "CN=" . implode(', ', array_reverse($x509['issuer']));
+		$issuer = self::formatIssuer($x509['issuer']);
 		$serialNumber = $x509['serialNumber'];
 
 		$publicKey = base64_decode(self::cleanCertificate($cert['key']));
@@ -80,6 +80,29 @@ class Crypto
 			"publicKey" => $publicKey,
 			"signature" => $signature,
 		];
+	}
+
+	public static function formatIssuer($issuer)
+	{
+		$issuer = array_reverse($issuer, true);
+
+		$issuerString = '';
+		foreach ($issuer as $key => $value) {
+			if (is_string($value)) {
+				if (!empty($issuerString)) $issuerString .= ', ';
+
+				$issuerString .= $key . '=' . $value;
+			} else if (is_array($value)) {
+				$value = array_reverse($value);
+				foreach ($value as $subValue) {
+					if (!empty($issuerString)) $issuerString .= ', ';
+
+					$issuerString .= $key . '=' . $subValue;
+				}
+			}
+		}
+
+		return $issuerString;
 	}
 
 	public static function cleanCertificate($certificate)
