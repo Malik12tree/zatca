@@ -23,22 +23,22 @@
                                         <ds:Transform Algorithm="http://www.w3.org/2006/12/xml-c14n11"></ds:Transform>
                                     </ds:Transforms>
                                     <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod>
-                                    <ds:DigestValue><?= $INVOICE_HASH ?></ds:DigestValue>
+                                    <ds:DigestValue><?= $INVOICE_HASH; ?></ds:DigestValue>
                                 </ds:Reference>
                                 <ds:Reference Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties" URI="#xadesSignedProperties">
                                     <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod>
-                                    <ds:DigestValue><?= $SIGNED_PROPERTIES_HASH ?></ds:DigestValue>
+                                    <ds:DigestValue><?= $SIGNED_PROPERTIES_HASH; ?></ds:DigestValue>
                                 </ds:Reference>
                             </ds:SignedInfo>
-                            <ds:SignatureValue><?= $DIGITAL_SIGNATURE ?></ds:SignatureValue>
+                            <ds:SignatureValue><?= $DIGITAL_SIGNATURE; ?></ds:SignatureValue>
                             <ds:KeyInfo>
                                 <ds:X509Data>
-                                    <ds:X509Certificate><?= $CERTIFICATE ?></ds:X509Certificate>
+                                    <ds:X509Certificate><?= $CERTIFICATE; ?></ds:X509Certificate>
                                 </ds:X509Data>
                             </ds:KeyInfo>
                             <ds:Object>
                             <xades:QualifyingProperties Target="signature" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#">
-<?= $SIGNED_PROPERTIES_XML ?>
+<?= $SIGNED_PROPERTIES_XML; ?>
 
                             </xades:QualifyingProperties>
                             </ds:Object>

@@ -13,44 +13,49 @@ $subTotals = [];
 
 foreach ($invoice->getLineItems() as $item) {
     list(
-        "percent" => $percent,
-        "category" => $category,
-        "reason" => $reason,
-        "reason_code" => $reason_code
+        'percent' => $percent,
+        'category' => $category,
+        'reason' => $reason,
+        'reason_code' => $reason_code,
     ) = getLineItemVATCategory($item);
 
     switch ($percent) {
         case 15:
             $fifteenSubTotal ??= [
-                "percent" => $percent,
-                "category" => $category,
-                "taxableAmount" => 0,
-                "taxAmount" => 0
+                'percent' => $percent,
+                'category' => $category,
+                'taxableAmount' => 0,
+                'taxAmount' => 0,
             ];
-            $fifteenSubTotal["taxableAmount"] += getLineItemSubtotal($item);
-            $fifteenSubTotal["taxAmount"] += getLineItemTaxes($item);
+            $fifteenSubTotal['taxableAmount'] += getLineItemSubtotal($item);
+            $fifteenSubTotal['taxAmount'] += getLineItemTaxes($item);
+
             break;
+
         case 5:
             $fiveSubTotal ??= [
-                "percent" => $percent,
-                "category" => $category,
-                "taxableAmount" => 0,
-                "taxAmount" => 0
+                'percent' => $percent,
+                'category' => $category,
+                'taxableAmount' => 0,
+                'taxAmount' => 0,
             ];
-            $fiveSubTotal["taxableAmount"] += getLineItemSubtotal($item);
-            $fiveSubTotal["taxAmount"] += getLineItemTaxes($item);
+            $fiveSubTotal['taxableAmount'] += getLineItemSubtotal($item);
+            $fiveSubTotal['taxAmount'] += getLineItemTaxes($item);
+
             break;
+
         case 0:
             $zeroSubTotalByCategory[$category] ??= [
-                "percent" => $percent,
-                "category" => $category,
-                "taxableAmount" => 0,
-                "taxAmount" => 0,
+                'percent' => $percent,
+                'category' => $category,
+                'taxableAmount' => 0,
+                'taxAmount' => 0,
                 // ? Only first occurring reason and code
-                "reason" => $reason ?? "",
-                "reason_code" => $reason_code ?? "",
+                'reason' => $reason ?? '',
+                'reason_code' => $reason_code ?? '',
             ];
-            $zeroSubTotalByCategory[$category]["taxableAmount"] += getLineItemSubtotal($item);
+            $zeroSubTotalByCategory[$category]['taxableAmount'] += getLineItemSubtotal($item);
+
             break;
     }
 }
@@ -68,27 +73,27 @@ foreach ($zeroSubTotalByCategory as $_ => $zeroSubTotal) {
 $taxesTotal = zatcaNumberFormat($invoice->computeTotalTaxes());
 ?>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="SAR"><?= zatcaNumberFormat($taxesTotal) ?></cbc:TaxAmount>
-<?php foreach ($subTotals as $subTotal): ?>
+        <cbc:TaxAmount currencyID="SAR"><?= zatcaNumberFormat($taxesTotal); ?></cbc:TaxAmount>
+<?php foreach ($subTotals as $subTotal) { ?>
         <cac:TaxSubtotal>
-            <cbc:TaxableAmount currencyID="SAR"><?= zatcaNumberFormat($subTotal['taxableAmount']) ?></cbc:TaxableAmount>
-            <cbc:TaxAmount currencyID="SAR"><?= zatcaNumberFormat($subTotal['taxAmount']) ?></cbc:TaxAmount>
+            <cbc:TaxableAmount currencyID="SAR"><?= zatcaNumberFormat($subTotal['taxableAmount']); ?></cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="SAR"><?= zatcaNumberFormat($subTotal['taxAmount']); ?></cbc:TaxAmount>
             <cac:TaxCategory>
-                <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305"><?= $subTotal['category'] ?></cbc:ID>
-                <cbc:Percent><?= zatcaNumberFormat($subTotal['percent']) ?></cbc:Percent>
-<?php if (isset($subTotal['reason_code'])): ?>
-                <cbc:TaxExemptionReasonCode><?= $subTotal['reason_code'] ?></cbc:TaxExemptionReasonCode>
-<?php endif ?>
-<?php if (isset($subTotal['reason'])): ?>
-                <cbc:TaxExemptionReason><?= $subTotal['reason'] ?></cbc:TaxExemptionReason>
-<?php endif ?>
+                <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305"><?= $subTotal['category']; ?></cbc:ID>
+                <cbc:Percent><?= zatcaNumberFormat($subTotal['percent']); ?></cbc:Percent>
+<?php if (isset($subTotal['reason_code'])) { ?>
+                <cbc:TaxExemptionReasonCode><?= $subTotal['reason_code']; ?></cbc:TaxExemptionReasonCode>
+<?php } ?>
+<?php if (isset($subTotal['reason'])) { ?>
+                <cbc:TaxExemptionReason><?= $subTotal['reason']; ?></cbc:TaxExemptionReason>
+<?php } ?>
                 <cac:TaxScheme>
                     <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5153">VAT</cbc:ID>
                 </cac:TaxScheme>
             </cac:TaxCategory>
         </cac:TaxSubtotal>
-<?php endforeach; ?>
+<?php } ?>
     </cac:TaxTotal>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="SAR"><?= zatcaNumberFormat($taxesTotal) ?></cbc:TaxAmount>
+        <cbc:TaxAmount currencyID="SAR"><?= zatcaNumberFormat($taxesTotal); ?></cbc:TaxAmount>
     </cac:TaxTotal>
