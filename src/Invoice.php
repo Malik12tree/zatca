@@ -6,6 +6,7 @@ use Malik12tree\ZATCA\Invoice\SignedInvoice;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 use Malik12tree\ZATCA\Utils\Encoding\TLV;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
+use Malik12tree\ZATCA\Utils\Validation;
 
 use function Malik12tree\ZATCA\Utils\getLineItemDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemPrice;
@@ -37,6 +38,8 @@ class Invoice
 
     public function __construct($unit, $data)
     {
+        Validation::invoice($data);
+
         $this->egsUnit = $unit;
         $this->issueDate = $data['issue_date'];
         $this->issueTime = $data['issue_time'];

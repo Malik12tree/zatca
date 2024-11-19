@@ -9,6 +9,7 @@ use Malik12tree\ZATCA\Invoice\SignedInvoice;
 use Malik12tree\ZATCA\Utils\API;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
+use Malik12tree\ZATCA\Utils\Validation;
 
 class EGS
 {
@@ -25,6 +26,7 @@ class EGS
         if (null == self::$env) {
             throw new \Exception('EGS Environment is not set. Use EGS::setEnv() to set it.');
         }
+        Validation::egs($unit);
 
         $this->unit = $unit;
         $this->api = new API(self::$env);
