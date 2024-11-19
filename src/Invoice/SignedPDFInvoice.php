@@ -2,11 +2,7 @@
 
 namespace Malik12tree\ZATCA\Invoice;
 
-use Malik12tree\ZATCA\Invoice\Enums\InvoiceCode;
-use Malik12tree\ZATCA\Utils\Rendering\Template;
 use Mpdf\Mpdf;
-use Mpdf\QrCode\Output;
-use Mpdf\QrCode\QrCode;
 
 class SignedPDFInvoice
 {
@@ -20,22 +16,7 @@ class SignedPDFInvoice
     {
         $this->signedInvoice = $signedInvoice;
 
-        $qrCode = new QrCode($this->signedInvoice->getQR());
-        $qrOutput = new Output\Png();
-
-        $flavor = InvoiceCode::TAX === $this->signedInvoice->getInvoice()->getCode() ? 'tax' : 'simplified';
-        list($pdfRender, $resultOptions) = Template::render(
-            '@pdfs/'.$flavor,
-            [
-                'invoice' => $this->getInvoice(),
-                'qr' => 'data:image/png;base64,'.base64_encode($qrOutput->output($qrCode, 124)),
-
-                'hasLogo' => $hasLogo = isset($options['logo']) ? (bool) $options['logo'] : false,
-            ],
-            true
-        );
-        $resultOptions = $resultOptions ?? [];
-        $resultOptions['mpdf'] = $resultOptions['mpdf'] ?? [];
+        list($render, $resultOptions) = $this->signedInvoice->toHTML($options, true);
 
         $mpdf = new Mpdf($resultOptions['mpdf'] + [
             'PDFA' => true,
@@ -49,11 +30,11 @@ class SignedPDFInvoice
         $mpdf->packTableData = true;
         $mpdf->shrink_tables_to_fit = 1;
 
-        if ($hasLogo) {
+        if ($resultOptions['hasLogo']) {
             $mpdf->imageVars['logo'] = file_get_contents($options['logo']);
         }
 
-        $mpdf->WriteHTML($pdfRender);
+        $mpdf->WriteHTML($render);
 
         $tmpXml = tmpfile();
         fwrite($tmpXml, $this->signedInvoice->getSignedInvoiceXML());
