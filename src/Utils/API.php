@@ -100,6 +100,33 @@ class API
         ];
     }
 
+    public function renewProductionCertificate($certificate, $secret, $csr, $otp)
+    {
+        $response = $this->patch(
+            '/production/csids',
+            [
+                'Accept-Version: '.API::VERSION,
+                'Content-Type: application/json',
+                'OTP: '.$otp,
+                ...$this->getAuthHeaders($certificate, $secret),
+            ],
+            [
+                'csr' => base64_encode($csr),
+            ],
+            'E_RENEW_PRODUCTION_CERTIFICATE'
+        );
+
+        $issuedCertificate = "-----BEGIN CERTIFICATE-----\n".base64_decode($response->binarySecurityToken)."\n-----END CERTIFICATE-----";
+        $apiSecret = $response->secret;
+        $requestId = $response->requestID;
+
+        return (object) [
+            'issued_certificate' => $issuedCertificate,
+            'api_secret' => $apiSecret,
+            'request_id' => $requestId,
+        ];
+    }
+
     public function reportInvoice($certificate, $secret, $signedInvoice, $invoiceHash, $egsUuid)
     {
         return $this->post(
@@ -156,7 +183,7 @@ class API
         return [];
     }
 
-    private function post($path, $headers, $data, $errorMessage)
+    private function request($method, $path, $headers, $data, $errorMessage)
     {
         $curl = curl_init($this->url.$path);
 
@@ -167,7 +194,7 @@ class API
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POSTFIELDS => json_encode($data),
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_SSL_VERIFYPEER => false,
@@ -186,5 +213,15 @@ class API
         }
 
         return json_decode($response);
+    }
+
+    private function post($path, $headers, $data, $errorMessage)
+    {
+        return $this->request('POST', $path, $headers, $data, $errorMessage);
+    }
+
+    private function patch($path, $headers, $data, $errorMessage)
+    {
+        return $this->request('PATCH', $path, $headers, $data, $errorMessage);
     }
 }
