@@ -9,7 +9,7 @@ use function Malik12tree\ZATCA\Utils\getLineItemUnitDiscount;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
 
 /** @var Invoice $invoice */
-$tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%" style="overflow: wrap"';
+$tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%"';
 const UNIT = 'SAR';
 const F_UNIT = ' '.UNIT;
 
@@ -168,8 +168,7 @@ $lineItemsTable = [
     ],
 ];
 
-function symmetricTableStyles($selector, $repeat = 1)
-{
+$symmetricTableStyles = static function ($selector, $repeat = 1) {
     $styles = [];
     for ($i = 0; $i < $repeat; ++$i) {
         $first = $i * 3 + 1;
@@ -194,52 +193,41 @@ function symmetricTableStyles($selector, $repeat = 1)
     return implode("\n", $styles);
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Tax Invoice</title>
-
-	<style>
-		table {
-			border-collapse: collapse
-		}
+<style>
+	.invoice-render table {
+		border-collapse: collapse
+	}
 
 
-		.title {
-			text-align: center;
-		}
+	.invoice-render__title {
+		text-align: center;
+	}
 
-		.invoice_body tbody td {
-			width: 16.66%;
-		}
+	.invoice-render__info tbody td {
+		width: 16.66%;
+	}
 
 
-		.line_items td {
-			text-align: center;
-			width: 12.5%;
-		}
+	.invoice-render__line-items td {
+		text-align: center;
+		width: 12.5%;
+	}
 
-		.totals tbody td {
-			width: 33.33%;
-		}
+	.invoice-render__totals tbody td {
+		width: 33.33%;
+	}
 
-		<?= symmetricTableStyles('.invoice_info'); ?>
-		/*  */
-		<?= symmetricTableStyles('.invoice_body', 2); ?>
-		/*  */
-		<?= symmetricTableStyles('.totals tbody', 2); ?>
-		/*  */
-	</style>
+	<?= $symmetricTableStyles('.invoice-render__info'); ?>
+	/*  */
+	<?= $symmetricTableStyles('.invoice-render__info', 2); ?>
+	/*  */
+	<?= $symmetricTableStyles('.invoice-render__totals tbody', 2); ?>
+	/*  */
+</style>
 
-</head>
+<div class="invoice-render">
 
-<body>
-	<h1 class="title">
+	<h1 class="invoice-render__title">
 		<span>Tax Invoice</span>
 		<?php if ($hasLogo) { ?>
 			<img src="var:logo" alt="Logo" height="100px" style="vertical-align: middle;" />
@@ -252,7 +240,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 	<table width="100%">
 		<tr>
 			<td>
-				<table class="invoice_info" <?= $tableAttrs; ?>>
+				<table class="invoice-render__info" <?= $tableAttrs; ?>>
 					<tr>
 						<td>Invoice Number</td>
 						<td><?= $invoice->getSerialNumber(); ?></td>
@@ -278,7 +266,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 
 	<br>
 
-	<table class="invoice_body" <?= $tableAttrs; ?>>
+	<table class="invoice-render__info" <?= $tableAttrs; ?>>
 		<thead>
 			<tr>
 				<?php foreach ($invoiceBodyTable['head'] as $columnTitle) { ?>
@@ -292,7 +280,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 		</thead>
 		<tbody>
 			<?php foreach ($invoiceBodyTable['rows'] as $row) { ?>
-				<?php $atLeastOneTruthy = false !== array_search(true, $row['values'], false); ?> 
+				<?php $atLeastOneTruthy = false !== array_search(true, $row['values'], false); ?>
 				<?php if ($atLeastOneTruthy) { ?>
 					<tr>
 						<?php foreach ($row['values'] as $value) { ?>
@@ -310,7 +298,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 	<br />
 	<br />
 
-	<table class="line_items" <?= $tableAttrs; ?>>
+	<table class="invoice-render__line-items" <?= $tableAttrs; ?>>
 		<thead>
 			<tr>
 				<th colspan="4" style="text-align: left;">Line Items</th>
@@ -346,7 +334,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 	<br />
 
 
-	<table class="totals" <?= $tableAttrs; ?>>
+	<table class="invoice-render__totals" <?= $tableAttrs; ?>>
 		<thead>
 			<tr>
 				<th colspan="3">
@@ -384,9 +372,7 @@ function symmetricTableStyles($selector, $repeat = 1)
 			</tr>
 		</tbody>
 	</table>
-</body>
-
-</html>
+</div>
 <?php return [
     'mpdf' => [
         'format' => 'letter',

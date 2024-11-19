@@ -7,7 +7,7 @@ use function Malik12tree\ZATCA\Utils\getLineItemTotal;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
 
 /** @var Invoice $invoice */
-$tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%" style="overflow: wrap"';
+$tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%"';
 
 const UNIT = 'ريال';
 const F_UNIT = ' '.UNIT;
@@ -48,31 +48,22 @@ $lineItemsTable = [
     ],
 ];
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tax Invoice</title>
-
+<div class="invoice-render" dir="rtl">
 	<style>
-		table {
+		.invoice-render table {
 			border-collapse: collapse;
 			text-align: center;
 		}
 
-		#totals td:nth-child(1) {
+		.invoice-render__totals td:nth-child(1) {
 			width: 75%;
 			text-align: start;
 		}
-		#totals td:nth-child(2) {
+		.invoice-render__totals td:nth-child(2) {
 			width: 25%;
 		}
 	</style>
-</head>
-<body dir="rtl">
-	<h1 class="title" align="center">
+	<h1 align="center">
 		فاتورة ضريبية مبسطة
 	</h1>
 	<h2 align="center"><?= $invoice->getEGS()['vat_name']; ?></h2>
@@ -94,7 +85,7 @@ $lineItemsTable = [
 		<?= $invoice->getEGS()['crn_number']; ?>
 	</p>
 	
-	<table <?= $tableAttrs; ?> id="line-items">
+	<table <?= $tableAttrs; ?>>
 		<thead>
 			<tr>
 				<?php foreach ($lineItemsTable as $columnName => list('ar' => $columnTitleAr)) { ?>
@@ -122,7 +113,7 @@ $lineItemsTable = [
 	<br />
 	<br />
 
-	<table <?= $tableAttrs; ?> id="totals">
+	<table <?= $tableAttrs; ?> class="invoice-render__totals">
 		<tr>
 			<td>المبلغ الخاضع للضریبة</td>
 			<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()); ?><?= F_UNIT; ?></td>
@@ -149,8 +140,7 @@ $lineItemsTable = [
 		</tr>
 	</table>
 
-</body>
-</html>
+</div>
 <?php return [
     'mpdf' => [
         'format' => [128, 128 * 1.5],
