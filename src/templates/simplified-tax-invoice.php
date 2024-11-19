@@ -144,21 +144,21 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
     <cac:Delivery>
         <cbc:ActualDeliveryDate><?= $ACTUAL_DELIVERY_DATE; ?></cbc:ActualDeliveryDate>
 <?php if (isset($LATEST_DELIVERY_DATE)) { ?>
-            <cbc:LatestDeliveryDate><?= $LATEST_DELIVERY_DATE; ?></cbc:LatestDeliveryDate>
+        <cbc:LatestDeliveryDate><?= $LATEST_DELIVERY_DATE; ?></cbc:LatestDeliveryDate>
 <?php } ?>
     </cac:Delivery>
 <?php } ?>
 <?php if (!isset($CANCELLATION)) { ?>
 <?php if (isset($PAYMENT_METHOD)) { ?>
-        <cac:PaymentMeans>
-            <cbc:PaymentMeansCode><?= $PAYMENT_METHOD; ?></cbc:PaymentMeansCode>
-        </cac:PaymentMeans>
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode><?= $PAYMENT_METHOD; ?></cbc:PaymentMeansCode>
+    </cac:PaymentMeans>
 <?php } ?>
 <?php } elseif (381 == $INVOICE_TYPE || 383 == $INVOICE_TYPE) { ?>
-        <cac:PaymentMeans>
+    <cac:PaymentMeans>
         <cbc:PaymentMeansCode><?= $CANCELLATION['payment_method']; ?></cbc:PaymentMeansCode>
         <cbc:InstructionNote><?= $CANCELLATION['reason'] ?? 'No note Specified'; ?></cbc:InstructionNote>
-        </cac:PaymentMeans>
+    </cac:PaymentMeans>
 <?php } ?>
 <?= $taxTotalRender; ?>
 
