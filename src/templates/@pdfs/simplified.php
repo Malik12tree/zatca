@@ -151,3 +151,12 @@ $lineItemsTable = [
 
 </body>
 </html>
+<?php return [
+    'mpdf' => [
+        'format' => [128, 128 * 1.5],
+        'margin_left' => 8,
+        'margin_right' => 8,
+        'margin_top' => 8,
+        'margin_bottom' => 8,
+    ],
+];

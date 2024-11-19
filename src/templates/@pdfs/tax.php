@@ -387,3 +387,8 @@ function symmetricTableStyles($selector, $repeat = 1)
 </body>
 
 </html>
+<?php return [
+    'mpdf' => [
+        'format' => 'letter',
+    ],
+];

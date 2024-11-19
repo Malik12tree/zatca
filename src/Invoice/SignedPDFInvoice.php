@@ -24,17 +24,20 @@ class SignedPDFInvoice
         $qrOutput = new Output\Png();
 
         $flavor = InvoiceCode::TAX === $this->signedInvoice->getInvoice()->getCode() ? 'tax' : 'simplified';
-        $pdfRender = Template::render(
+        list($pdfRender, $resultOptions) = Template::render(
             '@pdfs/'.$flavor,
             [
                 'invoice' => $this->getInvoice(),
                 'qr' => 'data:image/png;base64,'.base64_encode($qrOutput->output($qrCode, 124)),
 
                 'hasLogo' => $hasLogo = isset($options['logo']) ? (bool) $options['logo'] : false,
-            ]
+            ],
+            true
         );
+        $resultOptions = $resultOptions ?? [];
+        $resultOptions['mpdf'] = $resultOptions['mpdf'] ?? [];
 
-        $mpdf = new Mpdf([
+        $mpdf = new Mpdf($resultOptions['mpdf'] + [
             'PDFA' => true,
             'PDFAauto' => true,
         ]);
