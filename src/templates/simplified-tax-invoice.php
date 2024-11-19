@@ -34,7 +34,7 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
 <?php if (isset($CANCELLATION)) { ?>
         <cac:BillingReference>
             <cac:InvoiceDocumentReference>
-                <cbc:ID><?= $CANCELLATION['canceled_serial_invoice_number']; ?></cbc:ID>
+                <cbc:ID><?= $CANCELLATION['invoice_serial_number']; ?></cbc:ID>
             </cac:InvoiceDocumentReference>
         </cac:BillingReference>
 <?php } ?>

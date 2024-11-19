@@ -258,7 +258,7 @@ class EGS
                     ];
                     if (InvoiceType::INVOICE != $invoiceType) {
                         $data['cancellation'] = [
-                            'canceled_serial_invoice_number' => $data['invoice_serial_number'],
+                            'invoice_serial_number' => $data['invoice_serial_number'],
                             'payment_method' => InvoicePaymentMethod::CASH,
                             'reason' => 'KSA-10',
                         ];

@@ -67,9 +67,7 @@ class Invoice
                 'PREVIOUS_INVOICE_HASH' => $data['previous_invoice_hash'],
                 'CANCELLATION' => isset($data['cancellation'])
                     ? $data['cancellation']
-                    : (isset($data['cancelation']) // 🦅
-                        ? $data['cancelation']
-                        : null),
+                    : null,
                 'ACTUAL_DELIVERY_DATE' => isset($data['actual_delivery_date']) ? $data['actual_delivery_date'] : null,
                 'LATEST_DELIVERY_DATE' => isset($data['latest_delivery_date']) ? $data['latest_delivery_date'] : null,
                 'PAYMENT_METHOD' => isset($data['payment_method']) ? $data['payment_method'] : null,
