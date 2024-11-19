@@ -2,6 +2,7 @@
 
 namespace Malik12tree\ZATCA\Invoice;
 
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceCode;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
 use Mpdf\Mpdf;
 use Mpdf\QrCode\Output;
@@ -22,12 +23,16 @@ class SignedPDFInvoice
         $qrCode = new QrCode($this->signedInvoice->getQR());
         $qrOutput = new Output\Png();
 
-        $pdfRender = Template::render('invoice-pdf', [
-            'invoice' => $this->getInvoice(),
-            'qr' => 'data:image/png;base64,'.base64_encode($qrOutput->output($qrCode, 124)),
+        $flavor = InvoiceCode::TAX === $this->signedInvoice->getInvoice()->getCode() ? 'tax' : 'simplified';
+        $pdfRender = Template::render(
+            '@pdfs/'.$flavor,
+            [
+                'invoice' => $this->getInvoice(),
+                'qr' => 'data:image/png;base64,'.base64_encode($qrOutput->output($qrCode, 124)),
 
-            'hasLogo' => $hasLogo = isset($options['logo']) ? (bool) $options['logo'] : false,
-        ]);
+                'hasLogo' => $hasLogo = isset($options['logo']) ? (bool) $options['logo'] : false,
+            ]
+        );
 
         $mpdf = new Mpdf([
             'PDFA' => true,

@@ -26,6 +26,7 @@ class Invoice
     private $deliveryDate;
     private $invoiceSerialNumber;
     private $invoiceType;
+    private $invoiceCode;
     private $customerInfo;
     private $lineItems;
 
@@ -40,6 +41,7 @@ class Invoice
         $this->issueDate = $data['issue_date'];
         $this->issueTime = $data['issue_time'];
         $this->invoiceType = $data['invoice_type'];
+        $this->invoiceCode = $data['invoice_code'];
         $this->invoiceSerialNumber = $data['invoice_serial_number'];
         $this->vatNumber = $unit['vat_number'];
         $this->vatName = $unit['vat_name'];
@@ -98,6 +100,11 @@ class Invoice
     public function getType()
     {
         return $this->invoiceType;
+    }
+
+    public function getCode()
+    {
+        return $this->invoiceCode;
     }
 
     public function getIssueDate()
