@@ -46,9 +46,9 @@ class API
             'E_COMPLIANCE_CERTIFICATE'
         );
 
-        $issuedCertificate = "-----BEGIN CERTIFICATE-----\n".base64_decode($response->binarySecurityToken)."\n-----END CERTIFICATE-----";
-        $apiSecret = $response->secret;
-        $requestId = $response->requestID;
+        $issuedCertificate = "-----BEGIN CERTIFICATE-----\n".base64_decode($response['binarySecurityToken'])."\n-----END CERTIFICATE-----";
+        $apiSecret = $response['secret'];
+        $requestId = $response['requestID'];
 
         return (object) [
             'issued_certificate' => $issuedCertificate,
@@ -98,9 +98,9 @@ class API
             'E_PRODUCTION_CERTIFICATE'
         );
 
-        $issuedCertificate = "-----BEGIN CERTIFICATE-----\n".base64_decode($response->binarySecurityToken)."\n-----END CERTIFICATE-----";
-        $apiSecret = $response->secret;
-        $requestId = $response->requestID;
+        $issuedCertificate = "-----BEGIN CERTIFICATE-----\n".base64_decode($response['binarySecurityToken'])."\n-----END CERTIFICATE-----";
+        $apiSecret = $response['secret'];
+        $requestId = $response['requestID'];
 
         return (object) [
             'issued_certificate' => $issuedCertificate,
@@ -125,9 +125,9 @@ class API
             'E_RENEW_PRODUCTION_CERTIFICATE'
         );
 
-        $issuedCertificate = "-----BEGIN CERTIFICATE-----\n".base64_decode($response->binarySecurityToken)."\n-----END CERTIFICATE-----";
-        $apiSecret = $response->secret;
-        $requestId = $response->requestID;
+        $issuedCertificate = "-----BEGIN CERTIFICATE-----\n".base64_decode($response['binarySecurityToken'])."\n-----END CERTIFICATE-----";
+        $apiSecret = $response['secret'];
+        $requestId = $response['requestID'];
 
         return (object) [
             'issued_certificate' => $issuedCertificate,
