@@ -93,6 +93,13 @@ use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 // - production: This is used dangerously in production.
 EGS::setEnv('sandbox');
 
+// Disabled by default.
+// To prioritize code safety and prevent unexpected behavior, API warnings are disabled by default.
+// When disabled, any warnings are converted into exceptions, forcing the code to halt and address the issue immediately.
+// Enabling warnings can introduce potential risks,
+// so it's recommended to keep them turned off unless absolutely necessary.
+EGS::allowWarnings(false);
+
 $egs = new EGS([
     // EGS Serial Number
     // You should generate a unique UUID for each EGS
