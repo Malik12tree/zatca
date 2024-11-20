@@ -253,12 +253,23 @@ class EGS
                         'issue_date' => date('Y-m-d'),
                         'issue_time' => date('H:i:s'),
                         'previous_invoice_hash' => Invoice::INITIAL_PREVIOUS_HASH,
+
+                        'customer_info' => [
+                            'buyer_name' => 'Dummy',
+                            'city' => 'Dummy',
+                            'city_subdivision' => 'Dummy',
+                            'building' => 'Dummy',
+                            'postal_zone' => '00000',
+                            'street' => 'Dummy',
+                            'vat_number' => '300000000000003',
+                        ],
+
                         'line_items' => [
                             [
                                 'id' => 'dummy',
                                 'name' => 'Dummy Item',
-                                'quantity' => 1,
-                                'unit_price' => 10,
+                                'quantity' => 1.0,
+                                'unit_price' => 10.0,
                                 'vat_percent' => 0.15,
                             ],
                         ],
@@ -279,13 +290,13 @@ class EGS
             }
 
             $this->issueProductionCertificate($complianceRequestId);
-
-            return $this;
         } catch (\Exception $e) {
             $this->unit = $unitCopy;
 
             throw $e;
         }
+
+        return $this;
     }
 
     public function invoice($data)
