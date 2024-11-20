@@ -33,6 +33,11 @@ class EGS
         $this->isProduction = 'production' == self::$env;
     }
 
+    public static function allowWarnings($allowWarnings = true)
+    {
+        API::$allowWarnings = $allowWarnings;
+    }
+
     public static function setEnv($env)
     {
         if (null != self::$env) {

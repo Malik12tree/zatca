@@ -3,6 +3,7 @@
 namespace Malik12tree\ZATCA\Utils;
 
 use Malik12tree\ZATCA\Exceptions\APIException;
+use Malik12tree\ZATCA\Exceptions\ComplianceException;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
 
 class API
@@ -13,6 +14,7 @@ class API
         'production' => 'https://gw-fatoora.zatca.gov.sa/e-invoicing/core',
     ];
     public const VERSION = 'V2';
+    public static $allowWarnings = false;
 
     private $url;
 
@@ -57,21 +59,28 @@ class API
 
     public function checkInvoiceCompliance($certificate, $secret, $signedInvoice, $invoiceHash, $uuid)
     {
-        return $this->post(
-            '/compliance/invoices',
-            [
-                'Accept-Version: '.API::VERSION,
-                'Accept-Language: en',
-                'Content-Type: application/json',
-                ...$this->getAuthHeaders($certificate, $secret),
-            ],
-            [
-                'invoiceHash' => $invoiceHash,
-                'uuid' => $uuid,
-                'invoice' => base64_encode($signedInvoice),
-            ],
-            'E_COMPLIANCE_CHECK'
-        );
+        try {
+            return $this->post(
+                '/compliance/invoices',
+                [
+                    'Accept-Version: '.API::VERSION,
+                    'Accept-Language: en',
+                    'Content-Type: application/json',
+                    ...$this->getAuthHeaders($certificate, $secret),
+                ],
+                [
+                    'invoiceHash' => $invoiceHash,
+                    'uuid' => $uuid,
+                    'invoice' => base64_encode($signedInvoice),
+                ],
+                'E_COMPLIANCE_CHECK'
+            );
+        } catch (APIException $e) {
+            // Will only throw if applicable
+            ComplianceException::throwFromModel(!API::$allowWarnings, $e->getResponse());
+
+            throw $e;
+        }
     }
 
     public function issueProductionCertificate($certificate, $secret, $complianceRequestId)
@@ -208,11 +217,19 @@ class API
         }
 
         curl_close($curl);
-        if ($httpCode < 200 || $httpCode > 299) {
+
+        $response = json_decode($response, true);
+
+        $isSuccess =
+            API::$allowWarnings
+                ? 200 === $httpCode || 202 === $httpCode
+                : 200 === $httpCode;
+
+        if (!$isSuccess) {
             throw new APIException($errorMessage, $httpCode, $response);
         }
 
-        return json_decode($response);
+        return $response;
     }
 
     private function post($path, $headers, $data, $errorMessage)
