@@ -254,16 +254,6 @@ class EGS
                         'issue_time' => date('H:i:s'),
                         'previous_invoice_hash' => Invoice::INITIAL_PREVIOUS_HASH,
 
-                        'customer_info' => [
-                            'buyer_name' => 'Dummy',
-                            'city' => 'Dummy',
-                            'city_subdivision' => 'Dummy',
-                            'building' => 'Dummy',
-                            'postal_zone' => '00000',
-                            'street' => 'Dummy',
-                            'vat_number' => '300000000000003',
-                        ],
-
                         'line_items' => [
                             [
                                 'id' => 'dummy',
@@ -274,6 +264,17 @@ class EGS
                             ],
                         ],
                     ];
+                    if (InvoiceCode::TAX === $invoiceType) {
+                        $data['customer_info'] = [
+                            'buyer_name' => 'Dummy',
+                            'city' => 'Dummy',
+                            'city_subdivision' => 'Dummy',
+                            'building' => 'Dummy',
+                            'postal_zone' => '00000',
+                            'street' => 'Dummy',
+                            'vat_number' => '300000000000003',
+                        ];
+                    }
                     if (InvoiceType::INVOICE != $invoiceType) {
                         $data['cancellation'] = [
                             'invoice_serial_number' => $data['invoice_serial_number'],

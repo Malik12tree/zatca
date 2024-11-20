@@ -130,8 +130,11 @@ class Validation
         if (isset($invoice['cancellation'])) {
             Validation::cancellation($invoice['cancellation']);
         }
-        if (isset($invoice['cancellation'])) {
+
+        if (InvoiceCode::TAX === $invoice['invoice_code']) {
             Validation::customer(@$invoice['customer_info']);
+        } else {
+            Assert::null(@$invoice['customer_info']);
         }
 
         Validation::items(@$invoice['line_items']);
