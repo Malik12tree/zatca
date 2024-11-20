@@ -228,6 +228,9 @@ class Invoice
         $ublSignaturePropertiesRenderForSigning =
             Template::render('@simplified-tax-invoice/ubl-signature/properties/for-signing', $ublPropertiesVariables);
 
+        $ublSignaturePropertiesRenderForSigning = str_replace("\r\n", "\n", $ublSignaturePropertiesRenderForSigning);
+        $ublSignaturePropertiesRender = str_replace("\r\n", "\n", $ublSignaturePropertiesRender);
+
         $signedUBLSignaturePropertiesRender = base64_encode(bin2hex(Crypto::hashSHA256($ublSignaturePropertiesRenderForSigning)));
 
         $ublSignatureRender = Template::render('@simplified-tax-invoice/ubl-signature', [
@@ -237,6 +240,7 @@ class Invoice
             'CERTIFICATE' => Crypto::cleanCertificate($certificate),
             'SIGNED_PROPERTIES_XML' => $ublSignaturePropertiesRender,
         ]);
+        $ublSignatureRender = str_replace("\r\n", "\n", $ublSignatureRender);
 
         $invoiceRender = $this->invoiceXML;
         $invoiceRender = str_replace(
