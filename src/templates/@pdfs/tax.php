@@ -6,7 +6,9 @@ use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 use function Malik12tree\ZATCA\Utils\getLineItemTotal;
 use function Malik12tree\ZATCA\Utils\getLineItemUnitDiscount;
-use function Malik12tree\ZATCA\Utils\zatcaNumberFormat;
+use function Malik12tree\ZATCA\Utils\zatcaNumberFormatFree;
+use function Malik12tree\ZATCA\Utils\zatcaNumberFormatLong;
+use function Malik12tree\ZATCA\Utils\zatcaNumberFormatShort;
 
 /** @var Invoice $invoice */
 $tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%"';
@@ -119,7 +121,7 @@ $lineItemsTable = [
         'ar' => 'سعر الوحدة',
 
         '@map' => static function ($value, $row) {
-            return zatcaNumberFormat($value).F_UNIT;
+            return zatcaNumberFormatFree($value).F_UNIT;
         },
     ],
     'quantity' => [
@@ -131,7 +133,7 @@ $lineItemsTable = [
         'ar' => 'خصومات',
 
         '@map' => static function ($value, $row) {
-            return zatcaNumberFormat(getLineItemUnitDiscount($row)).F_UNIT;
+            return +zatcaNumberFormatLong(getLineItemUnitDiscount($row)).F_UNIT;
         },
     ],
     'taxable_amount' => [
@@ -139,7 +141,7 @@ $lineItemsTable = [
         'ar' => 'المبلغ الخاضع للضریبة',
 
         '@map' => static function ($value, $row) {
-            return zatcaNumberFormat(getLineItemSubtotal($row)).F_UNIT;
+            return zatcaNumberFormatShort(getLineItemSubtotal($row)).F_UNIT;
         },
     ],
     'vat_percent' => [
@@ -147,7 +149,7 @@ $lineItemsTable = [
         'ar' => 'نسبة للضريبة',
 
         '@map' => static function ($value, $row) {
-            return zatcaNumberFormat($value * 100).'%';
+            return zatcaNumberFormatFree($value * 100).'%';
         },
     ],
     'tax_amount' => [
@@ -155,7 +157,7 @@ $lineItemsTable = [
         'ar' => 'مبلغ الضريبة',
 
         '@map' => static function ($value, $row) {
-            return zatcaNumberFormat(getLineItemTaxes($row)).F_UNIT;
+            return zatcaNumberFormatShort(getLineItemTaxes($row)).F_UNIT;
         },
     ],
     'total' => [
@@ -163,7 +165,7 @@ $lineItemsTable = [
         'ar' => 'مجموع شامل الضريبة',
 
         '@map' => static function ($value, $row) {
-            return zatcaNumberFormat(getLineItemTotal($row)).F_UNIT;
+            return zatcaNumberFormatShort(getLineItemTotal($row)).F_UNIT;
         },
     ],
 ];
@@ -347,27 +349,27 @@ $symmetricTableStyles = static function ($selector, $repeat = 1) {
 		<tbody>
 			<tr>
 				<td>Total (Excluding VAT)</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalPrice()); ?><?= F_UNIT; ?></td>
+				<td><?= zatcaNumberFormatShort($invoice->computeTotalPrice()); ?><?= F_UNIT; ?></td>
 				<td>الإجمالي (باستثناء ضريبة القيمة المضافة)&rlm;</td>
 			</tr>
 			<tr>
 				<td>Discounts</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalDiscounts()); ?><?= F_UNIT; ?></td>
+				<td><?= zatcaNumberFormatShort($invoice->computeTotalDiscounts()); ?><?= F_UNIT; ?></td>
 				<td>مجموع الخصومات</td>
 			</tr>
 			<tr>
 				<td>Total Taxable Amount (Excluding VAT)</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalSubtotal()); ?><?= F_UNIT; ?></td>
+				<td><?= zatcaNumberFormatShort($invoice->computeTotalSubtotal()); ?><?= F_UNIT; ?></td>
 				<td>المبلغ الخاضع للضریبة (باستثناء ضریبة القیمة المضافة إجمالي)&rlm;</td>
 			</tr>
 			<tr>
 				<td>Total VAT</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotalTaxes()); ?><?= F_UNIT; ?></td>
+				<td><?= zatcaNumberFormatShort($invoice->computeTotalTaxes()); ?><?= F_UNIT; ?></td>
 				<td>الضريبة المضافة</td>
 			</tr>
 			<tr>
 				<td>Total Amount Due</td>
-				<td><?= zatcaNumberFormat($invoice->computeTotal()); ?><?= F_UNIT; ?></td>
+				<td><?= zatcaNumberFormatShort($invoice->computeTotal()); ?><?= F_UNIT; ?></td>
 				<td>إجمالي المبلغ المستحق</td>
 			</tr>
 		</tbody>

@@ -4,10 +4,35 @@ namespace Malik12tree\ZATCA\Utils;
 
 use Malik12tree\ZATCA\Invoice\Enums\InvoiceVATCategory;
 
-if (!function_exists('zatcaNumberFormat')) {
-    function zatcaNumberFormat($number)
+if (!function_exists('zatcaNumberFormatShort')) {
+    function zatcaNumberFormatShort($number)
     {
         return number_format($number, 2, '.', '');
+    }
+}
+
+if (!function_exists('zatcaNumberFormatNoWarning')) {
+    /**
+     * An alias for zatcaNumberFormatShort behaving as an annotation in code.
+     *
+     * @param mixed $number
+     */
+    function zatcaNumberFormatNoWarning($number)
+    {
+        return zatcaNumberFormatShort($number);
+    }
+}
+
+if (!function_exists('zatcaNumberFormatLong')) {
+    function zatcaNumberFormatLong($number)
+    {
+        return number_format($number, 14, '.', '');
+    }
+}
+if (!function_exists('zatcaNumberFormatFree')) {
+    function zatcaNumberFormatFree($number)
+    {
+        return strval($number);
     }
 }
 
