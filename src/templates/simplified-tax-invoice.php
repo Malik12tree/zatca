@@ -8,6 +8,7 @@ use function Malik12tree\ZATCA\Utils\getLineItemTotal;
 use function Malik12tree\ZATCA\Utils\getLineItemUnitPrice;
 use function Malik12tree\ZATCA\Utils\getLineItemUnitSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemVATCategory;
+use function Malik12tree\ZATCA\Utils\nonEmptyString;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatFree;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatLong;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatNoWarning;
@@ -68,22 +69,22 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
                 <cbc:ID schemeID="CRN"><?= $EGS['crn_number']; ?></cbc:ID>
             </cac:PartyIdentification>
             <cac:PostalAddress>
-<?php if (isset($EGS['location']['street'])) { ?>
+<?php if (nonEmptyString($EGS['location']['street'])) { ?>
                 <cbc:StreetName><?= $EGS['location']['street']; ?></cbc:StreetName>
 <?php } ?>
-<?php if (isset($EGS['location']['building'])) { ?>
+<?php if (nonEmptyString($EGS['location']['building'])) { ?>
                 <cbc:BuildingNumber><?= $EGS['location']['building']; ?></cbc:BuildingNumber>
 <?php } ?>
-<?php if (isset($EGS['location']['plot_identification'])) { ?>
+<?php if (nonEmptyString($EGS['location']['plot_identification'])) { ?>
                 <cbc:PlotIdentification><?= $EGS['location']['plot_identification']; ?></cbc:PlotIdentification>
 <?php } ?>
-<?php if (isset($EGS['location']['city_subdivision'])) { ?>
+<?php if (nonEmptyString($EGS['location']['city_subdivision'])) { ?>
                 <cbc:CitySubdivisionName><?= $EGS['location']['city_subdivision']; ?></cbc:CitySubdivisionName>
 <?php } ?>
-<?php if (isset($EGS['location']['city'])) { ?>
+<?php if (nonEmptyString($EGS['location']['city'])) { ?>
                 <cbc:CityName><?= $EGS['location']['city']; ?></cbc:CityName>
 <?php } ?>
-<?php if (isset($EGS['location']['postal_zone'])) { ?>
+<?php if (nonEmptyString($EGS['location']['postal_zone'])) { ?>
                 <cbc:PostalZone><?= $EGS['location']['postal_zone']; ?></cbc:PostalZone>
 <?php } ?>
                 <cac:Country>
@@ -108,29 +109,29 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
                 <cbc:ID schemeID="CRN"><?= isset($CUSTOMER_INFO['crn_number']) ? $CUSTOMER_INFO['crn_number'] : ''; ?></cbc:ID>
             </cac:PartyIdentification>
             <cac:PostalAddress>
-<?php if (isset($CUSTOMER_INFO['street'])) { ?>
+<?php if (nonEmptyString($CUSTOMER_INFO['street'])) { ?>
                 <cbc:StreetName><?= $CUSTOMER_INFO['street']; ?></cbc:StreetName>
 <?php } ?>
-<?php if (isset($CUSTOMER_INFO['building'])) { ?>
+<?php if (nonEmptyString($CUSTOMER_INFO['building'])) { ?>
                 <cbc:BuildingNumber><?= $CUSTOMER_INFO['building']; ?></cbc:BuildingNumber>
 <?php } ?>
-<?php if (isset($CUSTOMER_INFO['plot_identification'])) { ?>
+<?php if (nonEmptyString($CUSTOMER_INFO['plot_identification'])) { ?>
                 <cbc:PlotIdentification><?= $CUSTOMER_INFO['plot_identification']; ?></cbc:PlotIdentification>
 <?php } ?>
-<?php if (isset($CUSTOMER_INFO['city_subdivision'])) { ?>
+<?php if (nonEmptyString($CUSTOMER_INFO['city_subdivision'])) { ?>
                 <cbc:CitySubdivisionName><?= $CUSTOMER_INFO['city_subdivision']; ?></cbc:CitySubdivisionName>
 <?php } ?>
-<?php if (isset($CUSTOMER_INFO['city'])) { ?>
+<?php if (nonEmptyString($CUSTOMER_INFO['city'])) { ?>
                 <cbc:CityName><?= $CUSTOMER_INFO['city']; ?></cbc:CityName>
 <?php } ?>
-<?php if (isset($CUSTOMER_INFO['postal_zone'])) { ?>
+<?php if (nonEmptyString($CUSTOMER_INFO['postal_zone'])) { ?>
                 <cbc:PostalZone><?= $CUSTOMER_INFO['postal_zone']; ?></cbc:PostalZone>
 <?php } ?>
                 <cac:Country>
                     <cbc:IdentificationCode>SA</cbc:IdentificationCode>
                 </cac:Country>
             </cac:PostalAddress>
-<?php if (isset($CUSTOMER_INFO['vat_number'])) { ?>
+<?php if (nonEmptyString($CUSTOMER_INFO['vat_number'])) { ?>
             <cac:PartyTaxScheme>
                 <cbc:CompanyID><?= $CUSTOMER_INFO['vat_number']; ?></cbc:CompanyID>
                 <cac:TaxScheme>

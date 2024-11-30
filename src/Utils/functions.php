@@ -127,3 +127,10 @@ if (!function_exists('getLineItemVATCategory')) {
         ];
     }
 }
+
+if (!function_exists('nonEmptyString')) {
+    function nonEmptyString(&$x)
+    {
+        return null !== $x && is_string($x) && strlen($x) > 0;
+    }
+}

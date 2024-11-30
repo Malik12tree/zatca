@@ -3,6 +3,7 @@
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
 use function Malik12tree\ZATCA\Utils\getLineItemVATCategory;
+use function Malik12tree\ZATCA\Utils\nonEmptyString;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatFree;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatNoWarning;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatShort;
@@ -86,10 +87,10 @@ $taxesTotal = zatcaNumberFormatNoWarning($invoice->computeTotalTaxes());
             <cac:TaxCategory>
                 <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305"><?= $subTotal['category']; ?></cbc:ID>
                 <cbc:Percent><?= zatcaNumberFormatFree($subTotal['percent']); ?></cbc:Percent>
-<?php if (isset($subTotal['reason_code'])) { ?>
+<?php if (nonEmptyString($subTotal['reason_code'])) { ?>
                 <cbc:TaxExemptionReasonCode><?= $subTotal['reason_code']; ?></cbc:TaxExemptionReasonCode>
 <?php } ?>
-<?php if (isset($subTotal['reason'])) { ?>
+<?php if (nonEmptyString($subTotal['reason'])) { ?>
                 <cbc:TaxExemptionReason><?= $subTotal['reason']; ?></cbc:TaxExemptionReason>
 <?php } ?>
                 <cac:TaxScheme>

@@ -12,6 +12,7 @@ use function Malik12tree\ZATCA\Utils\getLineItemDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemPrice;
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
+use function Malik12tree\ZATCA\Utils\nonEmptyString;
 
 class Invoice
 {
@@ -71,9 +72,9 @@ class Invoice
                 'CANCELLATION' => isset($data['cancellation'])
                     ? $data['cancellation']
                     : null,
-                'ACTUAL_DELIVERY_DATE' => isset($data['actual_delivery_date']) ? $data['actual_delivery_date'] : null,
-                'LATEST_DELIVERY_DATE' => isset($data['latest_delivery_date']) ? $data['latest_delivery_date'] : null,
-                'PAYMENT_METHOD' => isset($data['payment_method']) ? $data['payment_method'] : null,
+                'ACTUAL_DELIVERY_DATE' => nonEmptyString($data['actual_delivery_date']) ? $data['actual_delivery_date'] : null,
+                'LATEST_DELIVERY_DATE' => nonEmptyString($data['latest_delivery_date']) ? $data['latest_delivery_date'] : null,
+                'PAYMENT_METHOD' => nonEmptyString($data['payment_method']) ? $data['payment_method'] : null,
             ], true);
         $this->xml = str_replace("\r\n", "\n", $this->xml);
     }
