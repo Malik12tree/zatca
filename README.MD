@@ -177,11 +177,11 @@ use Malik12tree\ZATCA\Invoice\Enums\InvoiceCode;
 use Malik12tree\ZATCA\Invoice\Enums\InvoiceType;
 
 $invoice = $egs->invoice([
-    'invoice_code' => InvoiceCode::TAX,
-    'invoice_type' => InvoiceType::INVOICE,
+    'code' => InvoiceCode::TAX,
+    'type' => InvoiceType::INVOICE,
 
-    'invoice_serial_number' => 'INV-0000001',
-    'invoice_counter_number' => 0,
+    'serial_number' => 'INV-0000001',
+    'counter_number' => 0,
 
     'issue_date' => date('Y-m-d'),
     'issue_time' => date('H:i:s'),

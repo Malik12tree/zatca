@@ -106,15 +106,15 @@ class Validation
     public static function invoice($invoice)
     {
         Assert::isArray($invoice);
-        Assert::notNull(@$invoice['invoice_counter_number']);
-        Assert::stringNotEmpty(@$invoice['invoice_serial_number']);
+        Assert::notNull(@$invoice['counter_number']);
+        Assert::stringNotEmpty(@$invoice['serial_number']);
         Assert::stringNotEmpty(@$invoice['issue_date']);
         Assert::stringNotEmpty(@$invoice['issue_time']);
         Assert::stringNotEmpty(@$invoice['previous_invoice_hash']);
         Assert::nullOrString(@$invoice['actual_delivery_date']);
         Assert::nullOrString(@$invoice['latest_delivery_date']);
-        Validation::enum7(@$invoice['invoice_type'], InvoiceType::class);
-        Validation::enum7(@$invoice['invoice_code'], InvoiceCode::class);
+        Validation::enum7(@$invoice['type'], InvoiceType::class);
+        Validation::enum7(@$invoice['code'], InvoiceCode::class);
         Validation::nullOrEnum7(@$invoice['payment_method'], InvoicePaymentMethod::class);
 
         Validation::dateFormat(@$invoice['issue_date']);
@@ -131,7 +131,7 @@ class Validation
             Validation::cancellation($invoice['cancellation']);
         }
 
-        if (InvoiceCode::TAX === $invoice['invoice_code']) {
+        if (InvoiceCode::TAX === $invoice['code']) {
             Validation::customer(@$invoice['customer_info']);
         } else {
             Assert::null(@$invoice['customer_info']);
@@ -142,7 +142,7 @@ class Validation
 
     public static function cancellation($cancellation)
     {
-        Assert::stringNotEmpty(@$cancellation['invoice_serial_number']);
+        Assert::stringNotEmpty(@$cancellation['serial_number']);
         Assert::stringNotEmpty(@$cancellation['reason']);
         Validation::enum7(@$cancellation['payment_method'], InvoicePaymentMethod::class);
     }

@@ -24,23 +24,23 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
 %UBL_EXTENSIONS_STRING%
     </ext:UBLExtensions>
     <cbc:ProfileID>reporting:1.0</cbc:ProfileID>
-    <cbc:ID><?= $INVOICE_SERIAL_NUMBER; ?></cbc:ID>
+    <cbc:ID><?= $SERIAL_NUMBER; ?></cbc:ID>
     <cbc:UUID><?= $EGS['uuid']; ?></cbc:UUID>
     <cbc:IssueDate><?= $ISSUE_DATE; ?></cbc:IssueDate>
     <cbc:IssueTime><?= $ISSUE_TIME; ?></cbc:IssueTime>
-    <cbc:InvoiceTypeCode name="<?= $INVOICE_CODE; ?>"><?= $INVOICE_TYPE; ?></cbc:InvoiceTypeCode>
+    <cbc:InvoiceTypeCode name="<?= $CODE; ?>"><?= $TYPE; ?></cbc:InvoiceTypeCode>
     <cbc:DocumentCurrencyCode>SAR</cbc:DocumentCurrencyCode>
     <cbc:TaxCurrencyCode>SAR</cbc:TaxCurrencyCode>
 <?php if (isset($CANCELLATION)) { ?>
         <cac:BillingReference>
             <cac:InvoiceDocumentReference>
-                <cbc:ID><?= $CANCELLATION['invoice_serial_number']; ?></cbc:ID>
+                <cbc:ID><?= $CANCELLATION['serial_number']; ?></cbc:ID>
             </cac:InvoiceDocumentReference>
         </cac:BillingReference>
 <?php } ?>
     <cac:AdditionalDocumentReference>
         <cbc:ID>ICV</cbc:ID>
-        <cbc:UUID><?= $INVOICE_COUNTER_NUMBER; ?></cbc:UUID>
+        <cbc:UUID><?= $COUNTER_NUMBER; ?></cbc:UUID>
     </cac:AdditionalDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>PIH</cbc:ID>
@@ -154,7 +154,7 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
         <cbc:PaymentMeansCode><?= $PAYMENT_METHOD; ?></cbc:PaymentMeansCode>
     </cac:PaymentMeans>
 <?php } ?>
-<?php } elseif (381 == $INVOICE_TYPE || 383 == $INVOICE_TYPE) { ?>
+<?php } elseif (381 == $TYPE || 383 == $TYPE) { ?>
     <cac:PaymentMeans>
         <cbc:PaymentMeansCode><?= $CANCELLATION['payment_method']; ?></cbc:PaymentMeansCode>
         <cbc:InstructionNote><?= $CANCELLATION['reason'] ?? 'No note Specified'; ?></cbc:InstructionNote>

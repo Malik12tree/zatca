@@ -17,7 +17,7 @@ class Invoice
 {
     // BR-KSA-26
     public const INITIAL_PREVIOUS_HASH = 'NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==';
-    private $invoiceXML;
+    private $xml;
 
     private $egsUnit;
     private $issueDate;
@@ -25,9 +25,9 @@ class Invoice
     private $vatNumber;
     private $vatName;
     private $deliveryDate;
-    private $invoiceSerialNumber;
-    private $invoiceType;
-    private $invoiceCode;
+    private $serialNumber;
+    private $type;
+    private $code;
     private $customerInfo;
     private $lineItems;
 
@@ -43,16 +43,16 @@ class Invoice
         $this->egsUnit = $unit;
         $this->issueDate = $data['issue_date'];
         $this->issueTime = $data['issue_time'];
-        $this->invoiceType = $data['invoice_type'];
-        $this->invoiceCode = $data['invoice_code'];
-        $this->invoiceSerialNumber = $data['invoice_serial_number'];
+        $this->type = $data['type'];
+        $this->code = $data['code'];
+        $this->serialNumber = $data['serial_number'];
         $this->vatNumber = $unit['vat_number'];
         $this->vatName = $unit['vat_name'];
         $this->deliveryDate = $data['actual_delivery_date'] ?? null;
         $this->customerInfo = $data['customer_info'] ?? [];
         $this->lineItems = $data['line_items'] ?? [];
 
-        list($this->invoiceXML, list(
+        list($this->xml, list(
             'total' => $this->total,
             'totalTax' => $this->totalTax,
         )) =
@@ -61,12 +61,12 @@ class Invoice
                 'EGS' => $unit,
                 'CUSTOMER_INFO' => $this->customerInfo,
                 'LINE_ITEMS' => $data['line_items'] ?? [],
-                'INVOICE_SERIAL_NUMBER' => $data['invoice_serial_number'],
+                'SERIAL_NUMBER' => $data['serial_number'],
                 'ISSUE_DATE' => $data['issue_date'],
                 'ISSUE_TIME' => $data['issue_time'],
-                'INVOICE_CODE' => $data['invoice_code'],
-                'INVOICE_TYPE' => $data['invoice_type'],
-                'INVOICE_COUNTER_NUMBER' => $data['invoice_counter_number'],
+                'CODE' => $data['code'],
+                'TYPE' => $data['type'],
+                'COUNTER_NUMBER' => $data['counter_number'],
                 'PREVIOUS_INVOICE_HASH' => $data['previous_invoice_hash'],
                 'CANCELLATION' => isset($data['cancellation'])
                     ? $data['cancellation']
@@ -75,7 +75,7 @@ class Invoice
                 'LATEST_DELIVERY_DATE' => isset($data['latest_delivery_date']) ? $data['latest_delivery_date'] : null,
                 'PAYMENT_METHOD' => isset($data['payment_method']) ? $data['payment_method'] : null,
             ], true);
-        $this->invoiceXML = str_replace("\r\n", "\n", $this->invoiceXML);
+        $this->xml = str_replace("\r\n", "\n", $this->xml);
     }
 
     public function getVATNumber()
@@ -95,17 +95,17 @@ class Invoice
 
     public function getSerialNumber()
     {
-        return $this->invoiceSerialNumber;
+        return $this->serialNumber;
     }
 
     public function getType()
     {
-        return $this->invoiceType;
+        return $this->type;
     }
 
     public function getCode()
     {
-        return $this->invoiceCode;
+        return $this->code;
     }
 
     public function getIssueDate()
@@ -185,7 +185,7 @@ class Invoice
 
     public function attachmentName($extension = '')
     {
-        $name = "{$this->vatNumber}_".date('Ymd\THis', strtotime("{$this->issueDate} {$this->issueTime}"))."_{$this->invoiceSerialNumber}";
+        $name = "{$this->vatNumber}_".date('Ymd\THis', strtotime("{$this->issueDate} {$this->issueTime}"))."_{$this->serialNumber}";
         if ($extension) {
             $name .= ".{$extension}";
         }
@@ -242,7 +242,7 @@ class Invoice
         ]);
         $ublSignatureRender = str_replace("\r\n", "\n", $ublSignatureRender);
 
-        $invoiceRender = $this->invoiceXML;
+        $invoiceRender = $this->xml;
         $invoiceRender = str_replace(
             ['%UBL_EXTENSIONS_STRING%', '%QR_CODE_DATA%'],
             [$ublSignatureRender, $qr],
@@ -278,7 +278,7 @@ class Invoice
     private function cleanedXML()
     {
         $document = new \DOMDocument();
-        $document->loadXML($this->invoiceXML);
+        $document->loadXML($this->xml);
 
         $element = $document->getElementsByTagName('UBLExtensions')->item(0);
         if ($element) {

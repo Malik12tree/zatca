@@ -245,11 +245,11 @@ class EGS
                     $data = [
                         'egs_info' => $this->unit,
 
-                        'invoice_code' => $invoiceCode,
-                        'invoice_type' => $invoiceType,
+                        'code' => $invoiceCode,
+                        'type' => $invoiceType,
 
-                        'invoice_counter_number' => 1,
-                        'invoice_serial_number' => Crypto::uuid4(),
+                        'counter_number' => 1,
+                        'serial_number' => Crypto::uuid4(),
                         'issue_date' => date('Y-m-d'),
                         'issue_time' => date('H:i:s'),
                         'previous_invoice_hash' => Invoice::INITIAL_PREVIOUS_HASH,
@@ -277,7 +277,7 @@ class EGS
                     }
                     if (InvoiceType::INVOICE != $invoiceType) {
                         $data['cancellation'] = [
-                            'invoice_serial_number' => $data['invoice_serial_number'],
+                            'serial_number' => $data['serial_number'],
                             'payment_method' => InvoicePaymentMethod::CASH,
                             'reason' => 'KSA-10',
                         ];
