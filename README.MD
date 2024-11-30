@@ -180,8 +180,6 @@ $invoice = $egs->invoice([
     'invoice_code' => InvoiceCode::TAX,
     'invoice_type' => InvoiceType::INVOICE,
 
-    // To your heart's desire
-    // Even uuids are acceptable
     'invoice_serial_number' => 'INV-0000001',
     'invoice_counter_number' => 0,
 
