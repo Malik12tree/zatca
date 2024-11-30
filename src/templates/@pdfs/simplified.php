@@ -94,20 +94,20 @@ $lineItemsTable = [
 					</th>
 				<?php } ?>
 			</tr>
-			<tbody>
-				<?php foreach ($invoice->getLineItems() as $lineItem) { ?>
-					<tr>
-						<?php foreach ($lineItemsTable as $columnName => $column) { ?>
-							<?php if (isset($column['@map'])) { ?>
-								<td><?= $column['@map']($lineItem[$columnName] ?? null, $lineItem); ?></td>
-							<?php } else { ?>
-								<td><?= $lineItem[$columnName]; ?></td>
-							<?php } ?>
-						<?php } ?>
-					</tr>
-				<?php } ?>
-			</tbody>
 		</thead>
+		<tbody>
+			<?php foreach ($invoice->getLineItems() as $lineItem) { ?>
+				<tr>
+					<?php foreach ($lineItemsTable as $columnName => $column) { ?>
+						<?php if (isset($column['@map'])) { ?>
+							<td><?= $column['@map']($lineItem[$columnName] ?? null, $lineItem); ?></td>
+						<?php } else { ?>
+							<td><?= $lineItem[$columnName]; ?></td>
+						<?php } ?>
+					<?php } ?>
+				</tr>
+			<?php } ?>
+		</tbody>
 	</table>
 
 	<br />
