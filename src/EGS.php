@@ -269,7 +269,7 @@ class EGS
                             'buyer_name' => 'Dummy',
                             'city' => 'Dummy',
                             'city_subdivision' => 'Dummy',
-                            'building' => 'Dummy',
+                            'building' => '0000',
                             'postal_zone' => '00000',
                             'street' => 'Dummy',
                             'vat_number' => '300000000000003',

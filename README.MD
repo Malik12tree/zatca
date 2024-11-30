@@ -120,7 +120,7 @@ $egs = new EGS([
     'branch_industry' => 'Trading',
 
     'location' => [
-        'building' => 'Al Yamama Tower',
+        'building' => '123',
         'street' => 'King Fahd Rd',
         'city_subdivision' => 'Al Olaya',
         'city' => 'Riyadh',
@@ -195,7 +195,7 @@ $invoice = $egs->invoice([
         'vat_number' => '300000000000003',
         'buyer_name' => 'Mahmoud 3gwa',
 
-        'building' => 'Juice Stand',
+        'building' => '1234',
         'street' => 'Abaseya Tunnel',
         'city_subdivision' => '',
         'city' => 'Dammam',

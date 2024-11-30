@@ -66,7 +66,7 @@ class Validation
         Assert::isArray($location);
         Assert::stringNotEmpty(@$location['city']);
         Assert::stringNotEmpty(@$location['street']);
-        Assert::stringNotEmpty(@$location['building']);
+        Assert::integerish(@$location['building']);
         Assert::nullOrString(@$location['city_subdivision']);
         Assert::nullOrString(@$location['plot_identification']);
         Assert::nullOrString(@$location['postal_zone']);
