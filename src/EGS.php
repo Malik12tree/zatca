@@ -44,7 +44,7 @@ class EGS
             throw new \Exception('EGS Environment is already set.');
         }
         if (!API::isEnvValid($env)) {
-            throw new \Exception('EGS Environment is not valid. Valid environments are '.implode(' | ', array_keys(API::APIS)));
+            throw new \Exception('EGS Environment is not valid. Valid environments are ' . implode(' | ', array_keys(API::APIS)));
         }
         self::$env = $env;
     }
@@ -204,7 +204,10 @@ class EGS
 
     public function getExpiryDate()
     {
-        return Crypto::getCertificateInfo($this->unit['production_certificate'])['expiryDate'];
+        $birthDate = Crypto::getCertificateInfo($this->unit['production_certificate'])['birthDate'];
+        $oneYearInSeconds = 60 * 60 * 24 * 365;
+
+        return $birthDate + $oneYearInSeconds;
     }
 
     public function setDatabase($database)
