@@ -23,6 +23,11 @@ class ComplianceException extends \Exception
         return $this->exceptions;
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
     public static function throwFromModel($includeWarnings, $response)
     {
         if (!is_array($response)) {
