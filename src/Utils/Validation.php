@@ -81,7 +81,8 @@ class Validation
 
     public static function building($value)
     {
-        Assert::integerish($value, self::MSG_BUILDING);
+        Assert::stringNotEmpty($value, self::MSG_BUILDING);
+        Assert::length($value, 4, self::MSG_BUILDING);
     }
 
     public static function plotIdentification($value)
