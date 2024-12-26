@@ -19,6 +19,26 @@ class Validation
         0.0, 0.05, 0.15,
     ];
 
+    public const MSG_EGS = 'Invalid EGS';
+    public const MSG_LOCATION = 'Invalid location';
+
+    public const MSG_VAT_NUMBER = 'VAT Number must be a valid 15 digits number starting and ending with "3"';
+    public const MSG_COMMON_NAME = 'Common Name must be a valid string';
+    public const MSG_CRN_NUMBER = 'CRN Number must be a valid integer';
+    public const MSG_MODEL = 'Model must be a valid string';
+    public const MSG_VAT_NAME = 'VAT Name must be a valid string';
+    public const MSG_BRANCH_NAME = 'Branch Name must be a valid string';
+    public const MSG_BRANCH_INDUSTRY = 'Branch Industry must be a valid string';
+    public const MSG_UUID = 'UUID must be a valid UUID';
+
+    public const MSG_CUSTOMER_LOCATION_PREFIX = '(customer) ';
+    public const MSG_CITY = 'City is required';
+    public const MSG_STREET = 'Street is required';
+    public const MSG_CITY_SUBDIVISION = 'City subdivision is required';
+    public const MSG_BUILDING = 'Building Number must be a valid 4-digit number';
+    public const MSG_PLOT_IDENTIFICATION = 'Plot identification must be a valid 4-digit number';
+    public const MSG_POSTAL_ZONE = 'Postal zone must be a valid 5-digit number';
+
     /**
      * An exact copy of Assert::uuid() from Webmozart/Assert
      * fixing issue [#307](https://github.com/webmozarts/assert/issues/307).
@@ -40,22 +60,45 @@ class Validation
         }
     }
 
+    // ! ||--------------------------------------------------------------------------------||
+    // ! ||                                 Raw Properties                                 ||
+    // ! ||--------------------------------------------------------------------------------||
     // BR-KSA-40
     public static function vatNumber($value)
     {
-        $message = '';
-        Assert::string($value);
-        Assert::integerish($value);
-        Assert::length($value, 15);
-        Assert::startsWith($value, '3');
-        Assert::endsWith($value, '3');
+        Assert::string($value, self::MSG_VAT_NUMBER);
+        Assert::integerish($value, self::MSG_VAT_NUMBER);
+        Assert::length($value, 15, self::MSG_VAT_NUMBER);
+        Assert::startsWith($value, '3', self::MSG_VAT_NUMBER);
+        Assert::endsWith($value, '3', self::MSG_VAT_NUMBER);
     }
 
     public static function commonName($value)
     {
-        Assert::string($value);
-        Assert::maxLength($value, 255);
+        Assert::string($value, self::MSG_COMMON_NAME);
+        Assert::maxLength($value, 255, self::MSG_COMMON_NAME);
     }
+
+    public static function building($value)
+    {
+        Assert::integerish($value, self::MSG_BUILDING);
+    }
+
+    public static function plotIdentification($value)
+    {
+        Assert::stringNotEmpty($value, self::MSG_PLOT_IDENTIFICATION);
+        Assert::length($value, 4, self::MSG_PLOT_IDENTIFICATION);
+    }
+
+    public static function postalZone($value)
+    {
+        Assert::stringNotEmpty($value, self::MSG_POSTAL_ZONE);
+        Assert::length($value, 5, self::MSG_POSTAL_ZONE);
+    }
+
+    // ! ||--------------------------------------------------------------------------------||
+    // ! ||                             Higher Level Properties                            ||
+    // ! ||--------------------------------------------------------------------------------||
 
     public static function location($location)
     {
@@ -63,24 +106,24 @@ class Validation
             return;
         }
 
-        Assert::isArray($location);
-        Assert::stringNotEmpty(@$location['city']);
-        Assert::stringNotEmpty(@$location['street']);
-        Assert::integerish(@$location['building']);
-        Assert::nullOrString(@$location['city_subdivision']);
-        Assert::nullOrString(@$location['plot_identification']);
-        Assert::nullOrString(@$location['postal_zone']);
+        Assert::isArray($location, self::MSG_LOCATION);
+        Assert::stringNotEmpty(@$location['city'], self::MSG_CITY);
+        Assert::stringNotEmpty(@$location['street'], self::MSG_STREET);
+        Assert::stringNotEmpty(@$location['city_subdivision'], self::MSG_CITY_SUBDIVISION);
+        Validation::building(@$location['building']);
+        Validation::plotIdentification(@$location['plot_identification']);
+        Validation::postalZone(@$location['postal_zone']);
     }
 
     public static function egs($egs)
     {
-        Assert::isArray($egs);
-        Assert::integerish(@$egs['crn_number']);
-        Assert::stringNotEmpty(@$egs['model']);
-        Assert::stringNotEmpty(@$egs['vat_name']);
-        Assert::stringNotEmpty(@$egs['branch_name']);
-        Assert::stringNotEmpty(@$egs['branch_industry']);
-        Validation::uuid(@$egs['uuid']);
+        Assert::isArray($egs, self::MSG_EGS);
+        Assert::integerish(@$egs['crn_number'], self::MSG_CRN_NUMBER);
+        Assert::stringNotEmpty(@$egs['model'], self::MSG_MODEL);
+        Assert::stringNotEmpty(@$egs['vat_name'], self::MSG_VAT_NAME);
+        Assert::stringNotEmpty(@$egs['branch_name'], self::MSG_BRANCH_NAME);
+        Assert::stringNotEmpty(@$egs['branch_industry'], self::MSG_BRANCH_INDUSTRY);
+        Validation::uuid(@$egs['uuid'], self::MSG_UUID);
         Validation::commonName(@$egs['common_name']);
         Validation::vatNumber(@$egs['vat_number']);
         Validation::location(@$egs['location']);
@@ -88,19 +131,15 @@ class Validation
 
     public static function customer($customer)
     {
-        Assert::stringNotEmpty(@$customer['buyer_name']);
-        Assert::nullOrString(@$customer['crn_number']);
-        Assert::nullOrString(@$customer['vat_number']);
+        Assert::integerish(@$customer['crn_number'], self::MSG_CRN_NUMBER);
+        Validation::vatNumber(@$customer['vat_number']);
 
-        if (null !== @$customer['crn_number']) {
-            Assert::integerish(@$customer['crn_number']);
+        try {
+            // Customer is a superset of location
+            Validation::location(@$customer);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException(self::MSG_CUSTOMER_LOCATION_PREFIX.$e->getMessage());
         }
-        if (null !== @$customer['vat_number']) {
-            Validation::vatNumber(@$customer['vat_number']);
-        }
-
-        // Customer is a superset of location
-        Validation::location(@$customer);
     }
 
     public static function invoice($invoice)
@@ -108,8 +147,6 @@ class Validation
         Assert::isArray($invoice);
         Assert::notNull(@$invoice['counter_number']);
         Assert::stringNotEmpty(@$invoice['serial_number']);
-        Assert::stringNotEmpty(@$invoice['issue_date']);
-        Assert::stringNotEmpty(@$invoice['issue_time']);
         Assert::stringNotEmpty(@$invoice['previous_invoice_hash']);
         Assert::nullOrString(@$invoice['actual_delivery_date']);
         Assert::nullOrString(@$invoice['latest_delivery_date']);
