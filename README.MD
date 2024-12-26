@@ -98,6 +98,7 @@ EGS::setEnv('sandbox');
 // When disabled, any warnings are converted into exceptions, forcing the code to halt and address the issue immediately.
 // Enabling warnings can introduce potential risks,
 // so it's recommended to keep them turned off unless absolutely necessary.
+// However, take notes that even if warnings are returned, ZATCA may still accept the invoice.
 EGS::allowWarnings(false);
 
 $egs = new EGS([
@@ -112,18 +113,18 @@ $egs = new EGS([
     // Known as CRN Number, License Number or Contract Number
     'crn_number' => '1234567890',
     // Known as VAT Name or Taxpayer Name
-    'vat_name' => 'My Totally Existing Company',
+    'vat_name' => 'أسم الشركة',
     // Known as VAT Registration Number
     // Should be a valid 15 digits number starting and ending with "3"
     'vat_number' => '300001234500003',
-    'branch_name' => 'My Really Profound Branch',
-    'branch_industry' => 'Trading',
+    'branch_name' => 'اسم الفرع',
+    'branch_industry' => 'الصناعة',
 
     'location' => [
         'building' => '123',
-        'street' => 'King Fahd Rd',
-        'city_subdivision' => 'Al Olaya',
-        'city' => 'Riyadh',
+        'street' => 'شارع الملك فهد',
+        'city_subdivision' => 'العلايا',
+        'city' => 'الرياض',
         'plot_identification' => '0000',
         'postal_zone' => '00000',
     ],
@@ -191,12 +192,12 @@ $invoice = $egs->invoice([
 
     'customer_info' => [
         'vat_number' => '300000000000003',
-        'buyer_name' => 'Mahmoud 3gwa',
+        'buyer_name' => 'محمود عغوة',
 
         'building' => '1234',
-        'street' => 'Abaseya Tunnel',
+        'street' => 'نفق العباسية',
         'city_subdivision' => '',
-        'city' => 'Dammam',
+        'city' => 'الدمام',
         'plot_identification' => '0000',
         'postal_zone' => '00000',
     ],
@@ -204,14 +205,14 @@ $invoice = $egs->invoice([
     'line_items' => [
         [
             'id' => "sugarcane_juicer_metal",
-            'name' => 'Metal Sugarcane Juicer',
+            'name' => 'عصارة قصب سكر معدنية',
             'quantity' => 1.0,
             'unit_price' => 525.0,
             'vat_percent' => 0.15,
             'discounts' => [
                 [
                     'amount' => 100.0,
-                    'reason' => 'Special Customer',
+                    'reason' => 'زبون مميز',
                 ],
             ],
         ],
