@@ -50,7 +50,7 @@ class Invoice
         $this->vatNumber = $unit['vat_number'];
         $this->vatName = $unit['vat_name'];
         $this->deliveryDate = $data['actual_delivery_date'] ?? null;
-        $this->customerInfo = $data['customer_info'] ?? [];
+        $this->customerInfo = $data['customer_info'] ?? null;
         $this->lineItems = $data['line_items'] ?? [];
 
         list($this->xml, list(
