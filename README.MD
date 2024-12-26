@@ -121,7 +121,9 @@ $egs = new EGS([
     'branch_industry' => 'الصناعة',
 
     'location' => [
-        'building' => '123',
+        // https://splonline.com.sa/en/national-address-1/ for more info
+        // Make sure the data is in Arabic
+        'building' => '1234',
         'street' => 'شارع الملك فهد',
         'city_subdivision' => 'العلايا',
         'city' => 'الرياض',
@@ -191,12 +193,15 @@ $invoice = $egs->invoice([
     'previous_invoice_hash' => Invoice::INITIAL_PREVIOUS_HASH,
 
     'customer_info' => [
+        'crn_number' => '1234567890',
         'vat_number' => '300000000000003',
         'buyer_name' => 'محمود عغوة',
 
+        // https://splonline.com.sa/en/national-address-1/ for more info
+        // Make sure the data is in Arabic
         'building' => '1234',
         'street' => 'نفق العباسية',
-        'city_subdivision' => '',
+        'city_subdivision' => 'العلايا',
         'city' => 'الدمام',
         'plot_identification' => '0000',
         'postal_zone' => '00000',
