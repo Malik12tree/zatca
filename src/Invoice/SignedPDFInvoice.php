@@ -21,6 +21,8 @@ class SignedPDFInvoice
         $mpdf = new Mpdf($resultOptions['mpdf'] + [
             'PDFA' => true,
             'PDFAauto' => true,
+
+            'tempDir' => sys_get_temp_dir(),
         ]);
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
