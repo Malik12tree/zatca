@@ -283,18 +283,18 @@ class Invoice
 
         $element = $document->getElementsByTagName('UBLExtensions')->item(0);
         if ($element) {
-            $element->remove();
+            $element->parentNode->removeChild($element);
         }
 
         $element = $document->getElementsByTagName('Signature')->item(0);
         if ($element) {
-            $element->remove();
+            $element->parentNode->removeChild($element);
         }
 
         // Remove QR Code Tag
         $element = $document->getElementsByTagName('AdditionalDocumentReference')->item(2);
         if ($element) {
-            $element->remove();
+            $element->parentNode->removeChild($element);
         }
 
         $cleanXML = str_replace(
