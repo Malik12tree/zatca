@@ -16,7 +16,6 @@ class EGS
     private static $env;
     private $api;
     private $unit;
-    private $isProduction;
 
     /** @var null|EGSDatabase */
     private $database;
@@ -30,7 +29,6 @@ class EGS
 
         $this->unit = $unit;
         $this->api = new API(self::$env);
-        $this->isProduction = 'production' == self::$env;
     }
 
     public static function allowWarnings($allowWarnings = true)
@@ -44,7 +42,7 @@ class EGS
             throw new \Exception('EGS Environment is already set.');
         }
         if (!API::isEnvValid($env)) {
-            throw new \Exception('EGS Environment is not valid. Valid environments are ' . implode(' | ', array_keys(API::APIS)));
+            throw new \Exception('EGS Environment is not valid. Valid environments are '.implode(' | ', array_keys(API::APIS)));
         }
         self::$env = $env;
     }
@@ -81,7 +79,6 @@ class EGS
             'TAXPAYER_NAME' => $this->unit['vat_name'],
             'COMMON_NAME' => $this->unit['common_name'],
             'PRIVATE_KEY_PASS' => 'SET_PRIVATE_KEY_PASS',
-            'PRODUCTION' => $this->isProduction,
         ]);
 
         fwrite($csrConfigFile, $csrConfig);
@@ -153,11 +150,18 @@ class EGS
     }
 
     /**
-     * @param Invoice $invoice
+     * @param Invoice         $invoice
+     * @param null|false|true $production When null, uses the appropriate certificate. When true, uses production certificate. When false, uses compliance certificate.
      */
-    public function signInvoice($invoice)
+    public function signInvoice($invoice, $production = null)
     {
-        $certificate = $this->isProduction ? $this->unit['production_certificate'] : $this->unit['compliance_certificate'];
+        if (null === $production) {
+            $certificate = $this->unit['production_certificate'] ?? $this->unit['compliance_certificate'];
+        } elseif (true === $production) {
+            $certificate = $this->unit['production_certificate'];
+        } elseif (false === $production) {
+            $certificate = $this->unit['compliance_certificate'];
+        }
 
         if (!$certificate || !$this->unit['private_key']) {
             throw new \Exception('EGS is missing a certificate/private key to sign the invoice.');
