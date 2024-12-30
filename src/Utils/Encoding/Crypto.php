@@ -75,7 +75,7 @@ class Crypto
         $cert = openssl_pkey_get_details($res);
 
         $issuer = self::formatIssuer($x509['issuer']);
-        $serialNumber = $x509['serialNumber'];
+        $serialNumber = number_format(hexdec($x509['serialNumberHex']), 0, '', '');
 
         $publicKey = base64_decode(self::cleanCertificate($cert['key']));
 
