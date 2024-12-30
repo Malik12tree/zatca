@@ -21,13 +21,15 @@ class Template
         return $render;
     }
 
-    public static function render(string $templateName, array $variables, bool $return = false)
+    public static function render(string $templateName, array $variables, bool $return = false, bool $isAbsolute = false)
     {
+        $path = $isAbsolute ? $templateName : __DIR__."/../../templates/{$templateName}.php";
+
         // No variable leakage! Pure magic~
         return self::capture(static function () {
             extract(func_get_arg(1));
 
-            return require __DIR__.'/../../templates/'.func_get_arg(0).'.php';
-        }, [$templateName, $variables], $return);
+            return require func_get_arg(0);
+        }, [$path, $variables], $return);
     }
 }

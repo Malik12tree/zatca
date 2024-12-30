@@ -57,14 +57,15 @@ class SignedInvoice
 
         $flavor = InvoiceCode::TAX === $this->getInvoice()->getCode() ? 'tax' : 'simplified';
         list($render, $resultOptions) = Template::render(
-            '@pdfs/'.$flavor,
+            $options['custom_template'] ?: ("@pdfs/{$flavor}"),
             [
                 'invoice' => $this->getInvoice(),
                 'qr' => 'data:image/png;base64,'.base64_encode($qrOutput->output($qrCode, 124)),
 
                 'hasLogo' => $hasLogo = isset($options['logo']) ? (bool) $options['logo'] : false,
             ],
-            true
+            true,
+            (bool) $options['custom_template']
         );
 
         $resultOptions = $resultOptions ?? [];
