@@ -271,7 +271,8 @@ class EGS
                             ],
                         ],
                     ];
-                    if (InvoiceCode::TAX === $invoiceType) {
+                    if (InvoiceCode::TAX === $invoiceCode) {
+                        $data['actual_delivery_date'] = date('Y-m-d');
                         $data['customer_info'] = [
                             'buyer_name' => 'Dummy',
                             'city' => 'Dummy',
@@ -280,6 +281,8 @@ class EGS
                             'postal_zone' => '00000',
                             'street' => 'Dummy',
                             'vat_number' => '300000000000003',
+                            'crn_number' => '1234567890',
+                            'plot_identification' => '1234',
                         ];
                     }
                     if (InvoiceType::INVOICE != $invoiceType) {
