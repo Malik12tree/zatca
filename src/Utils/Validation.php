@@ -21,6 +21,7 @@ class Validation
 
     public const MSG_EGS = 'Invalid EGS';
     public const MSG_LOCATION = 'Invalid location';
+    public const MSG_CUSTOMER = 'Customer is required';
 
     public const MSG_VAT_NUMBER = 'VAT Number must be a valid 15 digits number starting and ending with "3"';
     public const MSG_COMMON_NAME = 'Common Name must be a valid string';
@@ -132,6 +133,7 @@ class Validation
 
     public static function customer($customer)
     {
+        Assert::isArray($customer, self::MSG_CUSTOMER);
         Assert::integerish(@$customer['crn_number'], self::MSG_CRN_NUMBER);
         Validation::vatNumber(@$customer['vat_number']);
 
@@ -158,7 +160,7 @@ class Validation
         Validation::dateFormat(@$invoice['issue_date']);
         Validation::timeFormat(@$invoice['issue_time']);
 
-        if (null !== @$invoice['actual_delivery_date']) {
+        if (null !== @$invoice['actual_delivery_date'] || InvoiceCode::TAX === $invoice['code']) {
             Validation::dateFormat(@$invoice['actual_delivery_date']);
         }
         if (null !== @$invoice['latest_delivery_date']) {
