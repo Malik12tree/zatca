@@ -84,8 +84,9 @@ $titleByType = [
 	<h1 align="center">
 		<?= $titleByType['ar'][$invoice->getType()]; ?>
 	</h1>
-	<h2 align="center"><?= $invoice->getEGS()['vat_name']; ?></h2>
-	<h3 align="center">
+	<h2 align="center" style="margin: 0;"><?= $invoice->getEGS()['vat_name']; ?></h2>
+	<h4 align="center" style="margin: 0;color: grey;"><?= $invoice->getFormattedEGSLocation(); ?></h4>
+	<h3 align="center" style="margin: 0;">
 		<span>رقم الفاتورة</span>
 		<span>:</span>
 		<?= $invoice->getSerialNumber(); ?>

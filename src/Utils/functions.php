@@ -134,3 +134,29 @@ if (!function_exists('nonEmptyString')) {
         return null !== $x && is_string($x) && strlen($x) > 0;
     }
 }
+
+if (!function_exists('formatLocationComponents')) {
+    function formatLocationComponents(
+        $building,
+        $street,
+        $plot,
+        $subdivision,
+        $city,
+        $postal
+    ) {
+        return "{$building} - {$street} - {$plot} - {$subdivision} - {$city} - {$postal}";
+    }
+}
+if (!function_exists('formatLocation')) {
+    function formatLocation($location)
+    {
+        return formatLocationComponents(
+            $location['building'],
+            $location['street'],
+            $location['plot_identification'],
+            $location['city_subdivision'],
+            $location['city'],
+            $location['postal_zone']
+        );
+    }
+}
