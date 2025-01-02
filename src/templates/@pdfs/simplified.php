@@ -9,6 +9,8 @@ use function Malik12tree\ZATCA\Utils\zatcaNumberFormatFree;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatLong;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatShort;
 
+require_once __DIR__.'/data.php';
+
 /** @var Invoice $invoice */
 $tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%"';
 
@@ -52,16 +54,16 @@ $lineItemsTable = [
 ];
 
 $titleByType = [
-	"en" => [
-		InvoiceType::CREDIT_NOTE => "Simplified Tax Invoice (Credit Note)",
-		InvoiceType::DEBIT_NOTE => "Simplified Tax Invoice (Debit Note)",
-		InvoiceType::INVOICE => "Simplified Tax Invoice",
-	],
-	"ar" => [
-		InvoiceType::CREDIT_NOTE => "فاتورة ضريبية مبسطة (إشعار دائن)&rlm;",
-		InvoiceType::DEBIT_NOTE => "فاتورة ضريبية مبسطة (إشعار مدين)&rlm;",
-		InvoiceType::INVOICE => "فاتورة ضريبية مبسطة",
-	],
+    'en' => [
+        InvoiceType::CREDIT_NOTE => 'Simplified Tax Invoice (Credit Note)',
+        InvoiceType::DEBIT_NOTE => 'Simplified Tax Invoice (Debit Note)',
+        InvoiceType::INVOICE => 'Simplified Tax Invoice',
+    ],
+    'ar' => [
+        InvoiceType::CREDIT_NOTE => 'فاتورة ضريبية مبسطة (إشعار دائن)&rlm;',
+        InvoiceType::DEBIT_NOTE => 'فاتورة ضريبية مبسطة (إشعار مدين)&rlm;',
+        InvoiceType::INVOICE => 'فاتورة ضريبية مبسطة',
+    ],
 ];
 ?>
 <div class="invoice-render" dir="rtl">
@@ -80,7 +82,7 @@ $titleByType = [
 		}
 	</style>
 	<h1 align="center">
-		<?= $titleByType["ar"][$invoice->getType()]; ?>
+		<?= $titleByType['ar'][$invoice->getType()]; ?>
 	</h1>
 	<h2 align="center"><?= $invoice->getEGS()['vat_name']; ?></h2>
 	<h3 align="center">
@@ -90,16 +92,23 @@ $titleByType = [
 	</h3>
 
 
-	<p>
+	<p style="margin: 0;">
 		<b>تاریخ إصدار الفاتورة</b>
 		<span>:</span>
 		<?= $invoice->getFormattedIssueDate(); ?>
 	</p>
-	<p>
+	<p style="margin: 0;">
 		<b>رقم تسجيل ضريبة القيمة المضافة</b>
 		<span>:</span>
 		<?= $invoice->getEGS()['crn_number']; ?>
 	</p>
+	<?php if ($invoice->getPaymentMethod()) { ?>
+		<p style="margin: 0;">
+			<b>طريقة الدفع</b>
+			<span>:</span>
+			<?= $paymentTitleByMethod['ar'][$invoice->getPaymentMethod()]; ?>
+		</p>
+	<?php } ?>
 	
 	<table <?= $tableAttrs; ?>>
 		<thead>

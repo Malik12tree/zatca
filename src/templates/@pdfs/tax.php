@@ -11,6 +11,8 @@ use function Malik12tree\ZATCA\Utils\zatcaNumberFormatFree;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatLong;
 use function Malik12tree\ZATCA\Utils\zatcaNumberFormatShort;
 
+require_once __DIR__.'/data.php';
+
 /** @var Invoice $invoice */
 $tableAttrs = 'cellpadding="5px" autosize="1" border="1" width="100%"';
 const UNIT = 'SAR';
@@ -197,16 +199,16 @@ $symmetricTableStyles = static function ($selector, $repeat = 1) {
 };
 
 $titleByType = [
-	"en" => [
-		InvoiceType::CREDIT_NOTE => "Tax Invoice (Credit Note)",
-		InvoiceType::DEBIT_NOTE => "Tax Invoice (Debit Note)",
-		InvoiceType::INVOICE => "Tax Invoice",
-	],
-	"ar" => [
-		InvoiceType::CREDIT_NOTE => "فاتورة ضريبية (إشعار دائن)&rlm;",
-		InvoiceType::DEBIT_NOTE => "فاتورة ضريبية (إشعار مدين)&rlm;",
-		InvoiceType::INVOICE => "فاتورة ضريبية",
-	],
+    'en' => [
+        InvoiceType::CREDIT_NOTE => 'Tax Invoice (Credit Note)',
+        InvoiceType::DEBIT_NOTE => 'Tax Invoice (Debit Note)',
+        InvoiceType::INVOICE => 'Tax Invoice',
+    ],
+    'ar' => [
+        InvoiceType::CREDIT_NOTE => 'فاتورة ضريبية (إشعار دائن)&rlm;',
+        InvoiceType::DEBIT_NOTE => 'فاتورة ضريبية (إشعار مدين)&rlm;',
+        InvoiceType::INVOICE => 'فاتورة ضريبية',
+    ],
 ];
 ?>
 <style>
@@ -249,13 +251,13 @@ $titleByType = [
 <div class="invoice-render">
 
 	<h1 class="invoice-render__title">
-		<span><?= $titleByType["en"][$invoice->getType()]; ?></span>
+		<span><?= $titleByType['en'][$invoice->getType()]; ?></span>
 		<?php if ($hasLogo) { ?>
 			<img src="var:logo" alt="Logo" height="100px" style="vertical-align: middle;" />
 		<?php } else { ?>
 			<span> - </span>
 		<?php } ?>
-		<span><?= $titleByType["ar"][$invoice->getType()]; ?></span>
+		<span><?= $titleByType['ar'][$invoice->getType()]; ?></span>
 	</h1>
 
 	<table width="100%">
@@ -277,6 +279,17 @@ $titleByType = [
 						<td><?= $invoice->getDeliveryDate(); ?></td>
 						<td>التورید تاریخ</td>
 					</tr>
+					<?php if ($invoice->getPaymentMethod()) { ?>
+						<tr>
+							<td>Payment Method</td>
+							<td>
+								<span><?= $paymentTitleByMethod['en'][$invoice->getPaymentMethod()]; ?></span>
+								<span> | </span>
+								<span><?= $paymentTitleByMethod['ar'][$invoice->getPaymentMethod()]; ?></span>	
+							</td>
+							<td>طريقة الدفع</td>
+						</tr>
+					<?php } ?>
 				</table>
 			</td>
 			<td style="text-align: right">

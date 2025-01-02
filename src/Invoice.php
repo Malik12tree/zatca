@@ -32,6 +32,7 @@ class Invoice
     private $customerInfo;
     private $lineItems;
     private $cancellation;
+    private $paymentMethod;
 
     private $total;
     private $totalTax;
@@ -54,6 +55,7 @@ class Invoice
         $this->customerInfo = $data['customer_info'] ?? null;
         $this->lineItems = $data['line_items'] ?? [];
         $this->cancellation = $data['cancellation'] ?? null;
+        $this->paymentMethod = nonEmptyString($data['payment_method']) ? $data['payment_method'] : null;
 
         list($this->xml, list(
             'total' => $this->total,
@@ -74,7 +76,7 @@ class Invoice
                 'CANCELLATION' => $this->cancellation,
                 'ACTUAL_DELIVERY_DATE' => nonEmptyString($data['actual_delivery_date']) ? $data['actual_delivery_date'] : null,
                 'LATEST_DELIVERY_DATE' => nonEmptyString($data['latest_delivery_date']) ? $data['latest_delivery_date'] : null,
-                'PAYMENT_METHOD' => nonEmptyString($data['payment_method']) ? $data['payment_method'] : null,
+                'PAYMENT_METHOD' => $this->paymentMethod,
             ], true);
         $this->xml = str_replace("\r\n", "\n", $this->xml);
     }
@@ -132,6 +134,11 @@ class Invoice
     public function getCancellation($key = null)
     {
         return $key ? ($this->cancellation[$key] ?? null) : $this->cancellation;
+    }
+
+    public function getPaymentMethod()
+    {
+        return $this->paymentMethod;
     }
 
     public function getCustomerInfo($key = null)
