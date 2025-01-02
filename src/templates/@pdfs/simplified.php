@@ -154,8 +154,11 @@ $titleByType = [
 	</table>
 
 	<?php if ($invoice->getCancellation()) { ?>
+		<br />
 		<table <?= $tableAttrs; ?>>
-			<caption style="caption-side: top;">المرجع</caption>
+			<tr>
+				<th colspan="2">المرجع</th>
+			</tr>
 			<tr>
 				<td>رقم الفاتورة المرجعية</td>
 				<td><?= $invoice->getCancellation('serial_number'); ?></td>
