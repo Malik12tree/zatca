@@ -31,6 +31,7 @@ class Invoice
     private $code;
     private $customerInfo;
     private $lineItems;
+    private $cancellation;
 
     private $total;
     private $totalTax;
@@ -52,6 +53,7 @@ class Invoice
         $this->deliveryDate = $data['actual_delivery_date'] ?? null;
         $this->customerInfo = $data['customer_info'] ?? null;
         $this->lineItems = $data['line_items'] ?? [];
+        $this->cancellation = $data['cancellation'] ?? null;
 
         list($this->xml, list(
             'total' => $this->total,
@@ -69,9 +71,7 @@ class Invoice
                 'TYPE' => $data['type'],
                 'COUNTER_NUMBER' => $data['counter_number'],
                 'PREVIOUS_INVOICE_HASH' => $data['previous_invoice_hash'],
-                'CANCELLATION' => isset($data['cancellation'])
-                    ? $data['cancellation']
-                    : null,
+                'CANCELLATION' => $this->cancellation,
                 'ACTUAL_DELIVERY_DATE' => nonEmptyString($data['actual_delivery_date']) ? $data['actual_delivery_date'] : null,
                 'LATEST_DELIVERY_DATE' => nonEmptyString($data['latest_delivery_date']) ? $data['latest_delivery_date'] : null,
                 'PAYMENT_METHOD' => nonEmptyString($data['payment_method']) ? $data['payment_method'] : null,
@@ -127,6 +127,11 @@ class Invoice
     public function getLineItems()
     {
         return $this->lineItems;
+    }
+
+    public function getCancellation($key = null)
+    {
+        return $key ? ($this->cancellation[$key] ?? null) : $this->cancellation;
     }
 
     public function getCustomerInfo($key = null)

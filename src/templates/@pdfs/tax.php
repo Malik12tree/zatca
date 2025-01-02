@@ -1,6 +1,7 @@
 <?php
 
 use Malik12tree\ZATCA\Invoice;
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceType;
 
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
 use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
@@ -193,7 +194,20 @@ $symmetricTableStyles = static function ($selector, $repeat = 1) {
     }
 
     return implode("\n", $styles);
-}
+};
+
+$titleByType = [
+	"en" => [
+		InvoiceType::CREDIT_NOTE => "Tax Invoice (Credit Note)",
+		InvoiceType::DEBIT_NOTE => "Tax Invoice (Debit Note)",
+		InvoiceType::INVOICE => "Tax Invoice",
+	],
+	"ar" => [
+		InvoiceType::CREDIT_NOTE => "فاتورة ضريبية (إشعار دائن)&rlm;",
+		InvoiceType::DEBIT_NOTE => "فاتورة ضريبية (إشعار مدين)&rlm;",
+		InvoiceType::INVOICE => "فاتورة ضريبية",
+	],
+];
 ?>
 <style>
 	.invoice-render table {
@@ -218,6 +232,9 @@ $symmetricTableStyles = static function ($selector, $repeat = 1) {
 	.invoice-render__totals tbody td {
 		width: 33.33%;
 	}
+	.invoice-render__reference tbody td {
+		width: 33.33%;
+	}
 
 	<?= $symmetricTableStyles('.invoice-render__info'); ?>
 	/*  */
@@ -225,18 +242,20 @@ $symmetricTableStyles = static function ($selector, $repeat = 1) {
 	/*  */
 	<?= $symmetricTableStyles('.invoice-render__totals tbody', 2); ?>
 	/*  */
+	<?= $symmetricTableStyles('.invoice-render__reference tbody', 2); ?>
+	/*  */
 </style>
 
 <div class="invoice-render">
 
 	<h1 class="invoice-render__title">
-		<span>Tax Invoice</span>
+		<span><?= $titleByType["en"][$invoice->getType()]; ?></span>
 		<?php if ($hasLogo) { ?>
 			<img src="var:logo" alt="Logo" height="100px" style="vertical-align: middle;" />
 		<?php } else { ?>
 			<span> - </span>
 		<?php } ?>
-		<span>الفاتورة الضريبية</span>
+		<span><?= $titleByType["ar"][$invoice->getType()]; ?></span>
 	</h1>
 
 	<table width="100%">
@@ -374,6 +393,35 @@ $symmetricTableStyles = static function ($selector, $repeat = 1) {
 			</tr>
 		</tbody>
 	</table>
+
+	<?php if ($invoice->getCancellation()) { ?>
+		<br />
+		<br />
+		<table class="invoice-render__reference" <?= $tableAttrs; ?>>
+			<thead>
+				<tr>
+					<th colspan="3">
+						<span>Reference</span>
+						-
+						<span>المرجع</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Related Invoice's Number</td>
+					<td><?= $invoice->getCancellation('serial_number'); ?></td>
+					<td>رقم الفاتورة المرجعية</td>
+				</tr>
+				<tr>
+					<td>Issuance Reason</td>
+					<td><?= $invoice->getCancellation('reason'); ?></td>
+					<td>سبب إصدار الإشعار </td>
+				</tr>
+			</tbody>
+		</table>
+	<?php } ?>
+
 </div>
 <?php return [
     'mpdf' => [

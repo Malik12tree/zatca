@@ -1,6 +1,7 @@
 <?php
 
 use Malik12tree\ZATCA\Invoice;
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceType;
 
 use function Malik12tree\ZATCA\Utils\getLineItemDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemTotal;
@@ -49,6 +50,19 @@ $lineItemsTable = [
         },
     ],
 ];
+
+$titleByType = [
+	"en" => [
+		InvoiceType::CREDIT_NOTE => "Simplified Tax Invoice (Credit Note)",
+		InvoiceType::DEBIT_NOTE => "Simplified Tax Invoice (Debit Note)",
+		InvoiceType::INVOICE => "Simplified Tax Invoice",
+	],
+	"ar" => [
+		InvoiceType::CREDIT_NOTE => "فاتورة ضريبية مبسطة (إشعار دائن)&rlm;",
+		InvoiceType::DEBIT_NOTE => "فاتورة ضريبية مبسطة (إشعار مدين)&rlm;",
+		InvoiceType::INVOICE => "فاتورة ضريبية مبسطة",
+	],
+];
 ?>
 <div class="invoice-render" dir="rtl">
 	<style>
@@ -66,7 +80,7 @@ $lineItemsTable = [
 		}
 	</style>
 	<h1 align="center">
-		فاتورة ضريبية مبسطة
+		<?= $titleByType["ar"][$invoice->getType()]; ?>
 	</h1>
 	<h2 align="center"><?= $invoice->getEGS()['vat_name']; ?></h2>
 	<h3 align="center">
@@ -129,6 +143,20 @@ $lineItemsTable = [
 			<td><?= zatcaNumberFormatShort($invoice->computeTotal()); ?><?= F_UNIT; ?></td>
 		</tr>
 	</table>
+
+	<?php if ($invoice->getCancellation()) { ?>
+		<table <?= $tableAttrs; ?>>
+			<caption style="caption-side: top;">المرجع</caption>
+			<tr>
+				<td>رقم الفاتورة المرجعية</td>
+				<td><?= $invoice->getCancellation('serial_number'); ?></td>
+			</tr>
+			<tr>
+				<td>سبب إصدار الإشعار </td>
+				<td><?= $invoice->getCancellation('reason'); ?></td>
+			</tr>
+		</table>
+	<?php } ?>
 	
 	<br />
 	<hr />
