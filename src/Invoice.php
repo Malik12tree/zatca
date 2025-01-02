@@ -8,6 +8,7 @@ use Malik12tree\ZATCA\Utils\Encoding\TLV;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
 use Malik12tree\ZATCA\Utils\Validation;
 
+use function Malik12tree\ZATCA\Utils\formatLocation;
 use function Malik12tree\ZATCA\Utils\getLineItemDiscount;
 use function Malik12tree\ZATCA\Utils\getLineItemPrice;
 use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
@@ -144,6 +145,11 @@ class Invoice
     public function getCustomerInfo($key = null)
     {
         return $key ? ($this->customerInfo[$key] ?? null) : $this->customerInfo;
+    }
+
+    public function getFormattedEGSLocation()
+    {
+        return formatLocation($this->egsUnit['location']);
     }
 
     public function getFormattedIssueDate()

@@ -2,329 +2,327 @@
 
 namespace Malik12tree\ZATCA;
 
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceCode;
+use Malik12tree\ZATCA\Invoice\Enums\InvoicePaymentMethod;
+use Malik12tree\ZATCA\Invoice\Enums\InvoiceType;
 use Malik12tree\ZATCA\Invoice\SignedInvoice;
+use Malik12tree\ZATCA\Utils\API;
 use Malik12tree\ZATCA\Utils\Encoding\Crypto;
-use Malik12tree\ZATCA\Utils\Encoding\TLV;
 use Malik12tree\ZATCA\Utils\Rendering\Template;
 use Malik12tree\ZATCA\Utils\Validation;
 
-use function Malik12tree\ZATCA\Utils\formatLocation;
-use function Malik12tree\ZATCA\Utils\getLineItemDiscount;
-use function Malik12tree\ZATCA\Utils\getLineItemPrice;
-use function Malik12tree\ZATCA\Utils\getLineItemSubtotal;
-use function Malik12tree\ZATCA\Utils\getLineItemTaxes;
-use function Malik12tree\ZATCA\Utils\nonEmptyString;
-
-class Invoice
+class EGS
 {
-    // BR-KSA-26
-    public const INITIAL_PREVIOUS_HASH = 'NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==';
-    private $xml;
+    private static $env;
+    private $api;
+    private $unit;
 
-    private $egsUnit;
-    private $issueDate;
-    private $issueTime;
-    private $vatNumber;
-    private $vatName;
-    private $deliveryDate;
-    private $serialNumber;
-    private $type;
-    private $code;
-    private $customerInfo;
-    private $lineItems;
-    private $cancellation;
-    private $paymentMethod;
+    /** @var null|EGSDatabase */
+    private $database;
 
-    private $total;
-    private $totalTax;
-
-    private $cachedHash;
-
-    public function __construct($unit, $data)
+    public function __construct($unit)
     {
-        Validation::invoice($data);
+        if (null == self::$env) {
+            throw new \Exception('EGS Environment is not set. Use EGS::setEnv() to set it.');
+        }
+        Validation::egs($unit);
 
-        $this->egsUnit = $unit;
-        $this->issueDate = $data['issue_date'];
-        $this->issueTime = $data['issue_time'];
-        $this->type = $data['type'];
-        $this->code = $data['code'];
-        $this->serialNumber = $data['serial_number'];
-        $this->vatNumber = $unit['vat_number'];
-        $this->vatName = $unit['vat_name'];
-        $this->deliveryDate = $data['actual_delivery_date'] ?? null;
-        $this->customerInfo = $data['customer_info'] ?? null;
-        $this->lineItems = $data['line_items'] ?? [];
-        $this->cancellation = $data['cancellation'] ?? null;
-        $this->paymentMethod = nonEmptyString($data['payment_method']) ? $data['payment_method'] : null;
-
-        list($this->xml, list(
-            'total' => $this->total,
-            'totalTax' => $this->totalTax,
-        )) =
-            Template::render('simplified-tax-invoice', [
-                'invoice' => $this,
-                'EGS' => $unit,
-                'CUSTOMER_INFO' => $this->customerInfo,
-                'LINE_ITEMS' => $data['line_items'] ?? [],
-                'SERIAL_NUMBER' => $data['serial_number'],
-                'ISSUE_DATE' => $data['issue_date'],
-                'ISSUE_TIME' => $data['issue_time'],
-                'CODE' => $data['code'],
-                'TYPE' => $data['type'],
-                'COUNTER_NUMBER' => $data['counter_number'],
-                'PREVIOUS_INVOICE_HASH' => $data['previous_invoice_hash'],
-                'CANCELLATION' => $this->cancellation,
-                'ACTUAL_DELIVERY_DATE' => nonEmptyString($data['actual_delivery_date']) ? $data['actual_delivery_date'] : null,
-                'LATEST_DELIVERY_DATE' => nonEmptyString($data['latest_delivery_date']) ? $data['latest_delivery_date'] : null,
-                'PAYMENT_METHOD' => $this->paymentMethod,
-            ], true);
-        $this->xml = str_replace("\r\n", "\n", $this->xml);
+        $this->unit = $unit;
+        $this->api = new API(self::$env);
     }
 
-    public function getVATNumber()
+    public static function allowWarnings($allowWarnings = true)
     {
-        return $this->vatNumber;
+        API::$allowWarnings = $allowWarnings;
     }
 
-    public function getVATName()
+    public static function setEnv($env)
     {
-        return $this->vatName;
+        if (null != self::$env) {
+            throw new \Exception('EGS Environment is already set.');
+        }
+        if (!API::isEnvValid($env)) {
+            throw new \Exception('EGS Environment is not valid. Valid environments are '.implode(' | ', array_keys(API::APIS)));
+        }
+        self::$env = $env;
     }
 
-    public function getDeliveryDate()
+    public static function getEnv()
     {
-        return $this->deliveryDate;
+        return self::$env;
     }
 
-    public function getSerialNumber()
+    /**
+     * @return null|bool true if production, false if sandbox or simulation, null if not set
+     */
+    public static function isProduction()
     {
-        return $this->serialNumber;
-    }
-
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    public function getIssueDate()
-    {
-        return $this->issueDate;
-    }
-
-    public function getIssueTime()
-    {
-        return $this->issueTime;
-    }
-
-    public function getEGS()
-    {
-        return $this->egsUnit;
-    }
-
-    public function getLineItems()
-    {
-        return $this->lineItems;
-    }
-
-    public function getCancellation($key = null)
-    {
-        return $key ? ($this->cancellation[$key] ?? null) : $this->cancellation;
-    }
-
-    public function getPaymentMethod()
-    {
-        return $this->paymentMethod;
-    }
-
-    public function getCustomerInfo($key = null)
-    {
-        return $key ? ($this->customerInfo[$key] ?? null) : $this->customerInfo;
-    }
-
-    public function getFormattedEGSLocation()
-    {
-        return formatLocation($this->egsUnit['location']);
-    }
-
-    public function getFormattedIssueDate()
-    {
-        return "{$this->issueDate} {$this->issueTime}";
-    }
-
-    public function computeTotalTaxes()
-    {
-        $total = 0;
-        foreach ($this->lineItems as $lineItem) {
-            $total += getLineItemTaxes($lineItem);
+        if (null == self::$env) {
+            return null;
         }
 
-        return $total;
+        return 'production' == self::$env;
     }
 
-    public function computeTotalDiscounts()
+    public function generateNewKeysAndCSR($solutionName)
     {
-        $total = 0;
-        foreach ($this->lineItems as $lineItem) {
-            $total += getLineItemDiscount($lineItem);
-        }
+        $privateKey = Crypto::generateSecp256k1KeyPair();
 
-        return $total;
-    }
-
-    public function computeTotalSubtotal()
-    {
-        $total = 0;
-        foreach ($this->lineItems as $lineItem) {
-            $total += getLineItemSubtotal($lineItem);
-        }
-
-        return $total;
-    }
-
-    public function computeTotalPrice()
-    {
-        $total = 0;
-        foreach ($this->lineItems as $lineItem) {
-            $total += getLineItemPrice($lineItem);
-        }
-
-        return $total;
-    }
-
-    public function computeTotal()
-    {
-        return $this->computeTotalSubtotal() + $this->computeTotalTaxes();
-    }
-
-    public function attachmentName($extension = '')
-    {
-        $name = "{$this->vatNumber}_".date('Ymd\THis', strtotime("{$this->issueDate} {$this->issueTime}"))."_{$this->serialNumber}";
-        if ($extension) {
-            $name .= ".{$extension}";
-        }
-
-        return $name;
-    }
-
-    public function hash()
-    {
-        if ($this->cachedHash) {
-            return $this->cachedHash;
-        }
-
-        $cleanInvoice = $this->cleanedXML();
-
-        $hash = Crypto::hashSHA256($cleanInvoice);
-        $this->cachedHash = base64_encode($hash);
-
-        return $this->cachedHash;
-    }
-
-    public function sign($certificate, $privateKey)
-    {
-        $invoiceHash = $this->hash();
-        $certificateInfo = Crypto::getCertificateInfo($certificate);
-
-        $digitalSignature = base64_encode(Crypto::signSHA256($invoiceHash, $privateKey));
-
-        $qr = $this->qr($digitalSignature, $certificateInfo['publicKey'], $certificateInfo['signature']);
-
-        $ublPropertiesVariables = [
-            'SIGN_TIMESTAMP' => date('Y-m-d\TH:i:s\Z'),
-            'CERTIFICATE_HASH' => $certificateInfo['hash'],
-            'CERTIFICATE_ISSUER' => $certificateInfo['issuer'],
-            'CERTIFICATE_SERIAL_NUMBER' => $certificateInfo['serialNumber'],
-        ];
-
-        $ublSignaturePropertiesRender =
-            Template::render('@simplified-tax-invoice/ubl-signature/properties', $ublPropertiesVariables);
-        $ublSignaturePropertiesRenderForSigning =
-            Template::render('@simplified-tax-invoice/ubl-signature/properties/for-signing', $ublPropertiesVariables);
-
-        $ublSignaturePropertiesRenderForSigning = str_replace("\r\n", "\n", $ublSignaturePropertiesRenderForSigning);
-        $ublSignaturePropertiesRender = str_replace("\r\n", "\n", $ublSignaturePropertiesRender);
-
-        $signedUBLSignaturePropertiesRender = base64_encode(bin2hex(Crypto::hashSHA256($ublSignaturePropertiesRenderForSigning)));
-
-        $ublSignatureRender = Template::render('@simplified-tax-invoice/ubl-signature', [
-            'INVOICE_HASH' => $invoiceHash,
-            'SIGNED_PROPERTIES_HASH' => $signedUBLSignaturePropertiesRender,
-            'DIGITAL_SIGNATURE' => $digitalSignature,
-            'CERTIFICATE' => Crypto::cleanCertificate($certificate),
-            'SIGNED_PROPERTIES_XML' => $ublSignaturePropertiesRender,
-        ]);
-        $ublSignatureRender = str_replace("\r\n", "\n", $ublSignatureRender);
-
-        $invoiceRender = $this->xml;
-        $invoiceRender = str_replace(
-            ['%UBL_EXTENSIONS_STRING%', '%QR_CODE_DATA%'],
-            [$ublSignatureRender, $qr],
-            $invoiceRender
-        );
-
-        return new SignedInvoice($this, $invoiceRender, $invoiceHash, $qr);
-    }
-
-    private function qr($digitalSignature, $publicKey, $signature)
-    {
-        $sellerName = $this->vatName;
-        $vatNumber = $this->vatNumber;
-        $total = $this->total;
-        $vatTotal = $this->totalTax;
-        $dateTime = date('Y-m-d\TH:i:s', strtotime("{$this->issueDate} {$this->issueTime}"));
-
-        $qrTLV = TLV::encodeAll([
-            0x01 => $sellerName,
-            0x02 => $vatNumber,
-            0x03 => $dateTime,
-            0x04 => $total,
-            0x05 => $vatTotal,
-            0x06 => $this->hash(),
-            0x07 => $digitalSignature,
-            0x08 => $publicKey,
-            0x09 => $signature,
+        $csrConfigFile = tmpfile();
+        $csrConfig = Template::render('csr', [
+            'PRODUCTION_VALUE' => $this->isProduction() ? 'ZATCA-Code-Signing' : 'PREZATCA-Code-Signing',
+            'EGS_SERIAL_NUMBER' => "1-{$solutionName}|2-{$this->unit['model']}|3-{$this->unit['uuid']}",
+            'VAT_REGISTRATION_NUMBER' => $this->unit['vat_number'],
+            'BRANCH_LOCATION' => "{$this->unit['location']['building']} {$this->unit['location']['street']}, {$this->unit['location']['city']}",
+            'BRANCH_INDUSTRY' => $this->unit['branch_industry'],
+            'BRANCH_NAME' => $this->unit['branch_name'],
+            'TAXPAYER_NAME' => $this->unit['vat_name'],
+            'COMMON_NAME' => $this->unit['common_name'],
+            'PRIVATE_KEY_PASS' => 'SET_PRIVATE_KEY_PASS',
         ]);
 
-        return base64_encode($qrTLV);
+        fwrite($csrConfigFile, $csrConfig);
+        $csrRes = openssl_csr_new(
+            [
+                'commonName' => $this->unit['common_name'],
+                'organizationalUnitName' => $this->unit['branch_name'],
+                'organizationName' => $this->unit['vat_name'],
+                'countryName' => 'SA',
+            ],
+            $privateKey[2],
+            ['config' => stream_get_meta_data($csrConfigFile)['uri']],
+        );
+        openssl_csr_export($csrRes, $csr);
+        fclose($csrConfigFile);
+
+        $this->unit['private_key'] = Crypto::setCertificateTitle($privateKey[0], 'EC PRIVATE KEY');
+        $this->unit['csr'] = Crypto::setCertificateTitle($csr, 'CERTIFICATE REQUEST');
     }
 
-    private function cleanedXML()
+    public function issueComplianceCertificate(string $otp)
     {
-        $document = new \DOMDocument();
-        $document->loadXML($this->xml);
-
-        $element = $document->getElementsByTagName('UBLExtensions')->item(0);
-        if ($element) {
-            $element->parentNode->removeChild($element);
+        if (!$this->unit['csr']) {
+            throw new \Exception('EGS needs to generate a CSR first.');
         }
 
-        $element = $document->getElementsByTagName('Signature')->item(0);
-        if ($element) {
-            $element->parentNode->removeChild($element);
+        $res = $this->api->issueComplianceCertificate($this->unit['csr'], $otp);
+
+        $this->unit['compliance_certificate'] = $res->issued_certificate;
+        $this->unit['compliance_api_secret'] = $res->api_secret;
+
+        return $res->request_id;
+    }
+
+    public function issueProductionCertificate(int $complianceRequestId)
+    {
+        if (!$this->unit['compliance_certificate'] || !$this->unit['compliance_api_secret']) {
+            throw new \Exception('EGS is missing a certificate/private key/api secret to request a production certificate.');
         }
 
-        // Remove QR Code Tag
-        $element = $document->getElementsByTagName('AdditionalDocumentReference')->item(2);
-        if ($element) {
-            $element->parentNode->removeChild($element);
-        }
-
-        $cleanXML = str_replace(
-            [
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
-            ],
-            [
-                '',
-            ],
-            $document->saveXML(null, LIBXML_NOEMPTYTAG)
+        $res = $this->api->issueProductionCertificate(
+            $this->unit['compliance_certificate'],
+            $this->unit['compliance_api_secret'],
+            $complianceRequestId
         );
 
-        return trim($cleanXML);
+        $this->unit['production_certificate'] = $res->issued_certificate;
+        $this->unit['production_api_secret'] = $res->api_secret;
+
+        return $res->request_id;
+    }
+
+    /**
+     * @param SignedInvoice $signedInvoice
+     */
+    public function checkInvoiceCompliance($signedInvoice)
+    {
+        if (!$this->unit['compliance_certificate'] || !$this->unit['compliance_api_secret']) {
+            throw new \Exception('EGS is missing a certificate/private key/api secret to check the invoice compliance.');
+        }
+
+        return $this->api->checkInvoiceCompliance(
+            $this->unit['compliance_certificate'],
+            $this->unit['compliance_api_secret'],
+            $signedInvoice->getSignedInvoiceXML(),
+            $signedInvoice->getInvoiceHash(),
+            $this->unit['uuid']
+        );
+    }
+
+    /**
+     * @param Invoice         $invoice
+     * @param null|false|true $production When null, uses the appropriate certificate. When true, uses production certificate. When false, uses compliance certificate.
+     */
+    public function signInvoice($invoice, $production = null)
+    {
+        if (null === $production) {
+            $certificate = $this->unit['production_certificate'] ?? $this->unit['compliance_certificate'];
+        } elseif (true === $production) {
+            $certificate = $this->unit['production_certificate'];
+        } elseif (false === $production) {
+            $certificate = $this->unit['compliance_certificate'];
+        }
+
+        if (!$certificate || !$this->unit['private_key']) {
+            throw new \Exception('EGS is missing a certificate/private key to sign the invoice.');
+        }
+
+        return $invoice->sign($certificate, $this->unit['private_key']);
+    }
+
+    /**
+     * @param SignedInvoice $signedInvoice
+     */
+    public function reportInvoice($signedInvoice)
+    {
+        if (!$this->unit['production_api_secret'] || !$this->unit['production_certificate']) {
+            throw new \Exception('EGS is missing a production API certificate/secret to report the invoice.');
+        }
+
+        return $this->api->reportInvoice(
+            $this->unit['production_certificate'],
+            $this->unit['production_api_secret'],
+            $signedInvoice->getSignedInvoiceXML(),
+            $signedInvoice->getInvoiceHash(),
+            $this->unit['uuid']
+        );
+    }
+
+    /**
+     * @param SignedInvoice $signedInvoice
+     */
+    public function clearanceInvoice($signedInvoice)
+    {
+        if (!$this->unit['production_api_secret'] || !$this->unit['production_certificate']) {
+            throw new \Exception('EGS is missing a production API certificate/secret to report the invoice.');
+        }
+
+        return $this->api->clearanceInvoice(
+            $this->unit['production_certificate'],
+            $this->unit['production_api_secret'],
+            $signedInvoice->getSignedInvoiceXML(),
+            $signedInvoice->getInvoiceHash(),
+            $this->unit['uuid']
+        );
+    }
+
+    public function getExpiryDate()
+    {
+        $birthDate = Crypto::getCertificateInfo($this->unit['production_certificate'])['birthDate'];
+        $oneYearInSeconds = 60 * 60 * 24 * 365;
+
+        return $birthDate + $oneYearInSeconds;
+    }
+
+    public function setDatabase($database)
+    {
+        $this->database = $database;
+
+        return $this;
+    }
+
+    public function save()
+    {
+        if (!$this->database) {
+            throw new \Exception('EGS database is not set.');
+        }
+
+        $this->database->save($this);
+
+        return $this;
+    }
+
+    public function register($solutionName, $otp)
+    {
+        // Incase of a failure, we need to rollback the state of the EGS unit.
+        $unitCopy = $this->unit;
+
+        try {
+            $this->generateNewKeysAndCSR($solutionName);
+            $complianceRequestId = $this->issueComplianceCertificate($otp);
+
+            // * Checking invoice compliance 6 times each of the following types is
+            // * required to be able to issue a production certificate.
+            // * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+            // * ┃  standard-invoice  ━━  standard-credit-note  ━━  standard-debit-note  ┃
+            // * ┃ simplified-invoice ━━ simplified-credit-note ━━ simplified-debit-note ┃
+            // * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+            foreach (InvoiceCode::cases() as $invoiceCode) {
+                foreach (InvoiceType::cases() as $invoiceType) {
+                    $data = [
+                        'egs_info' => $this->unit,
+
+                        'code' => $invoiceCode,
+                        'type' => $invoiceType,
+
+                        'counter_number' => 1,
+                        'serial_number' => Crypto::uuid4(),
+                        'issue_date' => date('Y-m-d'),
+                        'issue_time' => date('H:i:s'),
+                        'previous_invoice_hash' => Invoice::INITIAL_PREVIOUS_HASH,
+
+                        'payment_method' => InvoicePaymentMethod::CASH,
+
+                        'line_items' => [
+                            [
+                                'id' => 'dummy',
+                                'name' => 'Dummy Item',
+                                'quantity' => 1.0,
+                                'unit_price' => 10.0,
+                                'vat_percent' => 0.15,
+                            ],
+                        ],
+                    ];
+                    if (InvoiceCode::TAX === $invoiceCode) {
+                        $data['actual_delivery_date'] = date('Y-m-d');
+                        $data['customer_info'] = [
+                            'buyer_name' => 'Dummy',
+                            'city' => 'Dummy',
+                            'city_subdivision' => 'Dummy',
+                            'building' => '0000',
+                            'postal_zone' => '00000',
+                            'street' => 'Dummy',
+                            'vat_number' => '300000000000003',
+                            'crn_number' => '1234567890',
+                            'plot_identification' => '1234',
+                        ];
+                    }
+                    if (InvoiceType::INVOICE != $invoiceType) {
+                        $data['cancellation'] = [
+                            'serial_number' => $data['serial_number'],
+                            'reason' => 'KSA-10',
+                        ];
+                    }
+
+                    $invoice = $this->invoice($data);
+
+                    $signedInvoice = $this->signInvoice($invoice);
+                    $this->checkInvoiceCompliance($signedInvoice);
+                }
+            }
+
+            $this->issueProductionCertificate($complianceRequestId);
+        } catch (\Exception $e) {
+            $this->unit = $unitCopy;
+
+            throw $e;
+        }
+
+        return $this;
+    }
+
+    public function invoice($data)
+    {
+        return new Invoice($this->unit, $data);
+    }
+
+    public function getUUID()
+    {
+        return $this->unit['uuid'];
+    }
+
+    public function toJSON()
+    {
+        return $this->unit;
     }
 }
