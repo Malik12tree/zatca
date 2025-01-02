@@ -167,8 +167,10 @@ class Validation
             Validation::dateFormat(@$invoice['latest_delivery_date']);
         }
 
-        if (isset($invoice['cancellation'])) {
+        if (InvoiceType::INVOICE !== $invoice['type']) {
             Validation::cancellation($invoice['cancellation']);
+        } else {
+            Assert::null(@$invoice['cancellation']);
         }
 
         if (InvoiceCode::TAX === $invoice['code']) {
