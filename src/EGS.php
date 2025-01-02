@@ -261,6 +261,8 @@ class EGS
                         'issue_time' => date('H:i:s'),
                         'previous_invoice_hash' => Invoice::INITIAL_PREVIOUS_HASH,
 
+                        'payment_method' => InvoicePaymentMethod::CASH,
+
                         'line_items' => [
                             [
                                 'id' => 'dummy',
@@ -288,7 +290,6 @@ class EGS
                     if (InvoiceType::INVOICE != $invoiceType) {
                         $data['cancellation'] = [
                             'serial_number' => $data['serial_number'],
-                            'payment_method' => InvoicePaymentMethod::CASH,
                             'reason' => 'KSA-10',
                         ];
                     }

@@ -155,7 +155,6 @@ class Validation
         Assert::nullOrString(@$invoice['latest_delivery_date']);
         Validation::enum7(@$invoice['type'], InvoiceType::class);
         Validation::enum7(@$invoice['code'], InvoiceCode::class);
-        Validation::nullOrEnum7(@$invoice['payment_method'], InvoicePaymentMethod::class);
 
         Validation::dateFormat(@$invoice['issue_date']);
         Validation::timeFormat(@$invoice['issue_time']);
@@ -168,8 +167,10 @@ class Validation
         }
 
         if (InvoiceType::INVOICE !== $invoice['type']) {
+            Validation::enum7(@$invoice['payment_method'], InvoicePaymentMethod::class);
             Validation::cancellation($invoice['cancellation']);
         } else {
+            Validation::nullOrEnum7(@$invoice['payment_method'], InvoicePaymentMethod::class);
             Assert::null(@$invoice['cancellation']);
         }
 
@@ -186,7 +187,6 @@ class Validation
     {
         Assert::stringNotEmpty(@$cancellation['serial_number']);
         Assert::stringNotEmpty(@$cancellation['reason']);
-        Validation::enum7(@$cancellation['payment_method'], InvoicePaymentMethod::class);
     }
 
     public static function items($items)
