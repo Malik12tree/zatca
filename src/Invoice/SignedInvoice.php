@@ -60,7 +60,7 @@ class SignedInvoice
             $options['custom_template'] ?: ("@pdfs/{$flavor}"),
             [
                 'invoice' => $this->getInvoice(),
-                'qr' => 'data:image/png;base64,'.base64_encode($qrOutput->output($qrCode, 124)),
+                'qr' => 'data:image/png;base64,'.base64_encode($qrOutput->output($qrCode, 256)),
 
                 'hasLogo' => $hasLogo = isset($options['logo']) ? (bool) $options['logo'] : false,
             ],

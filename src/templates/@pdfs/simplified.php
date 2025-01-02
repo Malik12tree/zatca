@@ -174,7 +174,7 @@ $titleByType = [
 	<table style="width:100%;">
 		<tr>
 			<td align="center">
-				<img src="<?= htmlentities($qr); ?>" alt="QR Code" />
+				<img src="<?= htmlentities($qr); ?>" width="124" height="124" alt="QR Code" />
 			</td>
 		</tr>
 	</table>
