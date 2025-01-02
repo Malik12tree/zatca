@@ -37,11 +37,11 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
     <cbc:DocumentCurrencyCode>SAR</cbc:DocumentCurrencyCode>
     <cbc:TaxCurrencyCode>SAR</cbc:TaxCurrencyCode>
 <?php if (isset($CANCELLATION)) { ?>
-        <cac:BillingReference>
-            <cac:InvoiceDocumentReference>
-                <cbc:ID><?= $CANCELLATION['serial_number']; ?></cbc:ID>
-            </cac:InvoiceDocumentReference>
-        </cac:BillingReference>
+    <cac:BillingReference>
+        <cac:InvoiceDocumentReference>
+            <cbc:ID><?= $CANCELLATION['serial_number']; ?></cbc:ID>
+        </cac:InvoiceDocumentReference>
+    </cac:BillingReference>
 <?php } ?>
     <cac:AdditionalDocumentReference>
         <cbc:ID>ICV</cbc:ID>
@@ -161,7 +161,7 @@ $taxTotalRender = Template::render('@simplified-tax-invoice/tax-total', [
 <?php } ?>
 <?php } elseif (381 == $TYPE || 383 == $TYPE) { ?>
     <cac:PaymentMeans>
-        <cbc:PaymentMeansCode><?= $CANCELLATION['payment_method']; ?></cbc:PaymentMeansCode>
+        <cbc:PaymentMeansCode><?= $PAYMENT_METHOD; ?></cbc:PaymentMeansCode>
         <cbc:InstructionNote><?= $CANCELLATION['reason'] ?? 'No note Specified'; ?></cbc:InstructionNote>
     </cac:PaymentMeans>
 <?php } ?>
